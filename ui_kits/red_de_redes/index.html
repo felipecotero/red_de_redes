@@ -294,7 +294,7 @@
     border-top:54px solid #e6195b;border-left:54px solid transparent;z-index:5;
   }
   .ficha-hero{
-    padding:24px 28px 20px;background:#1a1715;color:#fff;
+    padding:20px 28px 22px;background:#1a1715;color:#fff;
     border-bottom:1.5px solid var(--rdr-ink);position:relative;overflow:hidden;
   }
   .ficha-hero::after{
@@ -302,7 +302,7 @@
   }
   .ficha-hero .eye{
     font-family:var(--rdr-font-mono);font-size:10.5px;
-    text-transform:uppercase;letter-spacing:0.16em;color:#e6195b;margin-bottom:6px;
+    text-transform:uppercase;letter-spacing:0.16em;color:#e6195b;margin-bottom:4px;
     display:inline-flex;align-items:center;gap:8px;
   }
   .ficha-hero .eye::before{
@@ -310,17 +310,25 @@
     box-shadow:0 0 0 3px rgba(230,25,91,.25);
     animation:p 1.6s ease-in-out infinite;
   }
-  .ficha-hero h3{
+  /* City name — the massive editorial centrepiece */
+  .ficha-city{
     font-family:var(--rdr-font-display);font-weight:700;text-transform:uppercase;
-    font-size:32px;line-height:0.92;margin:0;letter-spacing:0.005em;text-wrap:balance;
+    font-size:clamp(64px, 10vw, 120px);
+    line-height:0.83;letter-spacing:-0.025em;
+    color:#fff;margin:6px 0 4px;
+    /* let it overflow the right edge gracefully on narrow panels */
+    overflow:hidden;white-space:nowrap;text-overflow:clip;
   }
-  .ficha-hero h3 em{
-    font-family:var(--rdr-font-editorial);font-style:italic;font-weight:400;
-    text-transform:none;letter-spacing:-0.012em;color:#e6195b;
+  .ficha-dept{
+    font-family:var(--rdr-font-mono);font-size:11px;
+    text-transform:uppercase;letter-spacing:0.18em;
+    color:rgba(255,255,255,0.45);margin-bottom:10px;
   }
-  .ficha-hero .lugar{
-    font-family:var(--rdr-font-editorial);font-style:italic;font-size:18px;
-    color:rgba(255,255,255,0.85);margin-top:8px;
+  .ficha-red-name{
+    font-family:var(--rdr-font-editorial);font-style:italic;
+    font-size:14px;line-height:1.45;
+    color:rgba(255,255,255,0.65);
+    border-top:1px solid rgba(255,255,255,0.12);padding-top:10px;
   }
 
   .ficha-body{padding:24px 28px 28px;overflow-y:auto;flex:1}
@@ -330,18 +338,18 @@
   }
   .row:last-child{border-bottom:none}
   .row .k{
-    font-family:var(--rdr-font-mono);font-size:10px;
+    font-family:var(--rdr-font-mono);font-size:11px;
     text-transform:uppercase;letter-spacing:0.16em;color:var(--rdr-ink-mute);
     line-height:1.4;
   }
   .row .v{
-    font-family:var(--rdr-font-body);font-size:15px;line-height:1.5;
+    font-family:var(--rdr-font-body);font-size:16px;line-height:1.55;
     color:var(--rdr-ink);text-wrap:pretty;
   }
   .row .v b{font-weight:600;color:var(--rdr-ink)}
   .row .v.lead{
     font-family:var(--rdr-font-editorial);font-style:italic;
-    font-size:18px;color:var(--rdr-morado);line-height:1.35;text-wrap:pretty;
+    font-size:19px;color:var(--rdr-morado);line-height:1.38;text-wrap:pretty;
   }
   .row .v .num{
     font-family:var(--rdr-font-display);font-weight:700;
@@ -795,8 +803,9 @@ function renderFicha(){
   ficha.innerHTML = `
     <div class="ficha-hero">
       <div class="eye">Nodo priorizado · ${String(current+1).padStart(2,'0')} de ${String(nodos.length).padStart(2,'0')}</div>
-      <h3>${n.redLong.replace(/—/, '<em>—</em>')}</h3>
-      <div class="lugar">${n.city} · ${n.departamento}</div>
+      <div class="ficha-city">${n.city}</div>
+      <div class="ficha-dept">${n.departamento}</div>
+      <div class="ficha-red-name">${n.redLong}</div>
     </div>
 
     <div class="ficha-body">
@@ -919,6 +928,14 @@ function select(id){
 
 renderFicha();
 loadMap();
+
+/* Click on map background (not on a node) → reset zoom */
+document.querySelector('.stage').addEventListener('click', function(e){
+  // Ignore clicks that originated on a node button, the reset button, or UI overlays
+  if(!e.target.closest('.node, #zoomReset, .stage-head, .legend, .scroll-hint')){
+    resetZoom();
+  }
+});
 </script>
 
 </body>
