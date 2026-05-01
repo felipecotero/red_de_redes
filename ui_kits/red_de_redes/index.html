@@ -1,0 +1,701 @@
+<!doctype html>
+<html lang="es-CO">
+<head>
+<meta charset="utf-8">
+<title>Red de redes · Mapa de nodos · Minculturas 2026</title>
+<link rel="stylesheet" href="../../colors_and_type.css">
+<style>
+  *,*::before,*::after{box-sizing:border-box}
+  html,body{margin:0;padding:0;min-height:100vh}
+  body{
+    background:
+      radial-gradient(1200px 700px at 8% -8%, #ece6da 0%, transparent 60%),
+      radial-gradient(900px 600px at 100% 100%, #d6cfc1 0%, transparent 65%),
+      #dad3c4;
+    color:var(--rdr-ink); font-family:var(--rdr-font-body);
+  }
+
+  /* a11y bar */
+  .a11y-strip{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:9px 36px; background:rgba(26,23,21,0.05);
+    border-bottom:1px solid var(--rdr-line);
+    font-family:var(--rdr-font-mono);font-size:11px;
+    color:var(--rdr-ink-mute);text-transform:uppercase;letter-spacing:0.16em;
+  }
+  .a11y-strip a.skip{color:var(--rdr-ink);font-weight:600;text-decoration:none}
+
+  /* header */
+  header.top{
+    display:flex;align-items:flex-end;justify-content:space-between;gap:32px;
+    padding:28px 36px 20px;border-bottom:1.5px solid var(--rdr-ink);
+  }
+  .brand .eye{
+    font-family:var(--rdr-font-mono);font-size:10.5px;
+    text-transform:uppercase;letter-spacing:0.16em;color:var(--rdr-ink-mute);
+    margin-bottom:4px;
+  }
+  .brand h1{
+    font-family:var(--rdr-font-display);font-weight:700;text-transform:uppercase;
+    font-size:38px;line-height:0.9;color:var(--rdr-ink);margin:0;letter-spacing:0.005em;
+  }
+  .brand h1 em{
+    font-family:var(--rdr-font-editorial);font-style:italic;font-weight:400;
+    text-transform:none;letter-spacing:-0.012em;color:#e6195b;
+  }
+  .brand .doc{
+    font-family:var(--rdr-font-mono);font-size:11px;color:var(--rdr-ink-soft);
+    text-transform:uppercase;letter-spacing:0.14em;margin-top:6px;
+  }
+  .brand .doc b{color:var(--rdr-ink);font-weight:600}
+  header .meta{
+    text-align:right;
+    font-family:var(--rdr-font-mono);font-size:10.5px;color:var(--rdr-ink-mute);
+    text-transform:uppercase;letter-spacing:0.16em;
+  }
+  header .meta b{color:var(--rdr-ink);font-weight:600}
+  header .meta .pulse{
+    display:inline-flex;align-items:center;gap:8px;color:#e6195b;margin-bottom:4px;
+  }
+  header .meta .pulse::before{
+    content:"";width:8px;height:8px;border-radius:99px;background:#e6195b;
+    box-shadow:0 0 0 3px rgba(230,25,91,0.25);
+    animation:p 1.6s ease-in-out infinite;
+  }
+  @keyframes p{0%,100%{transform:scale(1)}50%{transform:scale(1.25)}}
+
+  /* main grid */
+  main{
+    max-width:1480px;margin:0 auto;padding:28px 36px 80px;
+    display:grid;grid-template-columns:1.4fr 1fr;gap:24px;align-items:stretch;
+  }
+
+  /* MAP STAGE */
+  .stage{
+    position:relative;min-height:880px;
+    background:
+      radial-gradient(700px 500px at 40% 38%,#efe9da 0%,transparent 70%),
+      #d3ccbd;
+    border:1.5px solid var(--rdr-ink);border-radius:14px;overflow:hidden;
+    box-shadow:0 24px 60px rgba(26,23,21,.10);
+  }
+  .stage::before{
+    content:"";position:absolute;inset:0;
+    background-image:
+      radial-gradient(circle at 20% 30%, rgba(26,23,21,.022) 0, transparent 1.5px),
+      radial-gradient(circle at 70% 60%, rgba(26,23,21,.020) 0, transparent 1.5px);
+    background-size:8px 8px,12px 12px;
+    mix-blend-mode:multiply;opacity:.55;pointer-events:none;
+  }
+
+  .stage-head{
+    position:absolute;top:18px;left:24px;right:24px;z-index:20;
+    display:flex;align-items:flex-start;justify-content:space-between;gap:18px;
+    pointer-events:none;
+  }
+  .stage-head .lbl{
+    font-family:var(--rdr-font-mono);font-size:10px;
+    text-transform:uppercase;letter-spacing:0.18em;color:var(--rdr-ink-mute);
+  }
+  .stage-head h2{
+    font-family:var(--rdr-font-display);font-weight:700;text-transform:uppercase;
+    font-size:34px;margin:6px 0 0;letter-spacing:0.005em;line-height:0.92;
+    color:var(--rdr-ink);
+  }
+  .stage-head h2 em{
+    font-family:var(--rdr-font-editorial);font-style:italic;font-weight:400;
+    text-transform:none;letter-spacing:-0.012em;color:#e6195b;
+  }
+  .legend{
+    background:rgba(244,240,232,0.7);
+    border:1.5px solid var(--rdr-ink);border-radius:8px;
+    padding:10px 12px;display:flex;flex-direction:column;gap:5px;
+    font-family:var(--rdr-font-mono);font-size:10px;
+    color:var(--rdr-ink-soft);text-transform:uppercase;letter-spacing:0.16em;
+  }
+  .legend span{display:inline-flex;align-items:center;gap:8px}
+  .legend i{width:9px;height:9px;border-radius:99px;border:1px solid rgba(26,23,21,.6)}
+
+  .map-svg{position:absolute;inset:0;width:100%;height:100%;z-index:1}
+  .nodes{position:absolute;inset:0;z-index:3;pointer-events:none}
+  .nodes > *{pointer-events:auto}
+
+  /* Loading state */
+  .map-loading{
+    position:absolute;inset:0;z-index:10;
+    display:flex;align-items:center;justify-content:center;flex-direction:column;gap:12px;
+    font-family:var(--rdr-font-mono);font-size:11px;color:var(--rdr-ink-mute);
+    text-transform:uppercase;letter-spacing:0.18em;
+  }
+  .map-loading .spinner{
+    width:30px;height:30px;border-radius:99px;
+    border:2px solid rgba(26,23,21,0.15);border-top-color:#e6195b;
+    animation:spin 0.9s linear infinite;
+  }
+  @keyframes spin{to{transform:rotate(360deg)}}
+
+  /* nodes */
+  .node{
+    position:absolute;transform:translate(-50%,-50%);
+    border-radius:99px;cursor:pointer;
+    transition:transform .25s var(--rdr-ease);z-index:4;
+    border:none;padding:0;
+  }
+  .node:focus-visible{outline:3px solid #e6195b;outline-offset:4px}
+  .node:hover{transform:translate(-50%,-50%) scale(1.3);z-index:30}
+
+  .node.nodo{
+    width:18px;height:18px;background:var(--rdr-morado);
+    border:2px solid var(--rdr-ink);
+    box-shadow:0 0 0 4px rgba(74,42,122,0.18);
+  }
+  .node.nodo.selected{
+    background:#e6195b;
+    box-shadow:0 0 0 6px rgba(230,25,91,0.25);
+    z-index:6;
+  }
+  .node.nodo.selected::after{
+    content:"";position:absolute;inset:-3px;border-radius:99px;
+    border:1.5px dashed var(--rdr-ink);
+    animation:rot 14s linear infinite;
+  }
+  @keyframes rot{to{transform:rotate(360deg)}}
+  .node.nodo.selected::before{
+    content:"";position:absolute;inset:-2px;border-radius:99px;
+    box-shadow:0 0 0 0 rgba(230,25,91,.55);
+    animation:ring 2.2s ease-out infinite;
+  }
+  @keyframes ring{0%{box-shadow:0 0 0 0 rgba(230,25,91,.5)}100%{box-shadow:0 0 0 28px rgba(230,25,91,0)}}
+
+  .node-label{
+    position:absolute;
+    font-family:var(--rdr-font-display);font-weight:700;text-transform:uppercase;
+    font-size:13px;line-height:1;letter-spacing:0.04em;color:var(--rdr-ink);
+    text-align:left;white-space:nowrap;pointer-events:none;
+    transform:translate(14px,-8px);
+  }
+  .node-label small{
+    display:block;margin-top:4px;
+    font-family:var(--rdr-font-mono);font-size:9.5px;font-weight:500;
+    text-transform:uppercase;letter-spacing:0.14em;color:var(--rdr-ink-mute);
+    text-wrap:pretty;
+  }
+  .node-label.selected{color:#e6195b}
+  .node-label.left{transform:translate(calc(-100% - 14px),-8px);text-align:right}
+
+  /* Capital reference (Bogotá) - small, non-clickable, just orientation */
+  .capital-ref{
+    position:absolute;width:9px;height:9px;border-radius:99px;
+    background:transparent;border:1.5px solid var(--rdr-ink);
+    transform:translate(-50%,-50%);z-index:3;
+  }
+  .capital-ref::after{
+    content:"Bogotá";position:absolute;top:14px;left:50%;transform:translateX(-50%);
+    font-family:var(--rdr-font-mono);font-size:9.5px;font-weight:500;
+    text-transform:uppercase;letter-spacing:0.14em;color:var(--rdr-ink-mute);
+    white-space:nowrap;
+  }
+
+  .compass{
+    position:absolute;bottom:18px;right:20px;z-index:20;
+    width:54px;height:54px;border-radius:99px;
+    border:1.5px solid var(--rdr-ink);background:rgba(244,240,232,0.7);
+    display:flex;align-items:center;justify-content:center;
+    font-family:var(--rdr-font-display);font-weight:700;font-size:13px;
+    color:var(--rdr-ink);
+  }
+  .compass::before{content:"N";position:absolute;top:6px;color:#e6195b}
+  .compass::after{
+    content:"";position:absolute;left:50%;top:14px;width:0;height:0;
+    border:5px solid transparent;border-bottom-color:#e6195b;transform:translateX(-50%);
+  }
+  .scale{
+    position:absolute;bottom:22px;left:24px;z-index:20;
+    display:flex;align-items:center;gap:8px;
+    font-family:var(--rdr-font-mono);font-size:9.5px;
+    text-transform:uppercase;letter-spacing:0.16em;color:var(--rdr-ink-mute);
+  }
+  .scale .bar{
+    width:80px;height:6px;border:1.5px solid var(--rdr-ink);position:relative;
+    background:linear-gradient(90deg,var(--rdr-ink) 50%,transparent 50%) 0/20px 6px;
+  }
+  .scale .bar::after{content:"0 — 250 — 500 km";position:absolute;top:9px;left:0;white-space:nowrap}
+
+  .map-attrib{
+    position:absolute;bottom:8px;right:84px;z-index:20;
+    font-family:var(--rdr-font-mono);font-size:9px;
+    color:var(--rdr-ink-mute);text-transform:uppercase;letter-spacing:0.14em;
+  }
+
+  /* FICHA panel */
+  .ficha{
+    background:#f4f0e8;border:1.5px solid var(--rdr-ink);border-radius:14px;
+    overflow:hidden;display:flex;flex-direction:column;
+    box-shadow:0 24px 60px rgba(26,23,21,.10);position:relative;
+  }
+  .ficha::before{
+    content:"";position:absolute;top:0;right:0;
+    width:0;height:0;
+    border-top:54px solid #e6195b;border-left:54px solid transparent;z-index:5;
+  }
+  .ficha-hero{
+    padding:24px 28px 20px;background:#1a1715;color:#fff;
+    border-bottom:1.5px solid var(--rdr-ink);position:relative;overflow:hidden;
+  }
+  .ficha-hero::after{
+    content:"";position:absolute;top:0;left:-2px;width:6px;height:100%;background:#e6195b;
+  }
+  .ficha-hero .eye{
+    font-family:var(--rdr-font-mono);font-size:10.5px;
+    text-transform:uppercase;letter-spacing:0.16em;color:#e6195b;margin-bottom:6px;
+    display:inline-flex;align-items:center;gap:8px;
+  }
+  .ficha-hero .eye::before{
+    content:"";width:7px;height:7px;border-radius:99px;background:#e6195b;
+    box-shadow:0 0 0 3px rgba(230,25,91,.25);
+    animation:p 1.6s ease-in-out infinite;
+  }
+  .ficha-hero h3{
+    font-family:var(--rdr-font-display);font-weight:700;text-transform:uppercase;
+    font-size:32px;line-height:0.92;margin:0;letter-spacing:0.005em;text-wrap:balance;
+  }
+  .ficha-hero h3 em{
+    font-family:var(--rdr-font-editorial);font-style:italic;font-weight:400;
+    text-transform:none;letter-spacing:-0.012em;color:#e6195b;
+  }
+  .ficha-hero .lugar{
+    font-family:var(--rdr-font-editorial);font-style:italic;font-size:18px;
+    color:rgba(255,255,255,0.85);margin-top:8px;
+  }
+
+  .ficha-body{padding:24px 28px 28px;overflow-y:auto;flex:1}
+  .row{
+    display:grid;grid-template-columns:120px 1fr;gap:14px;
+    padding:14px 0;border-bottom:1px dashed var(--rdr-line-strong);
+  }
+  .row:last-child{border-bottom:none}
+  .row .k{
+    font-family:var(--rdr-font-mono);font-size:10px;
+    text-transform:uppercase;letter-spacing:0.16em;color:var(--rdr-ink-mute);
+    line-height:1.4;
+  }
+  .row .v{
+    font-family:var(--rdr-font-body);font-size:15px;line-height:1.5;
+    color:var(--rdr-ink);text-wrap:pretty;
+  }
+  .row .v b{font-weight:600;color:var(--rdr-ink)}
+  .row .v.lead{
+    font-family:var(--rdr-font-editorial);font-style:italic;
+    font-size:18px;color:var(--rdr-morado);line-height:1.35;text-wrap:pretty;
+  }
+  .row .v .num{
+    font-family:var(--rdr-font-display);font-weight:700;
+    font-size:32px;line-height:1;color:#e6195b;letter-spacing:0;
+    display:inline-block;margin-right:8px;vertical-align:-2px;
+  }
+  .row .v .small{
+    display:block;margin-top:4px;
+    font-family:var(--rdr-font-mono);font-size:10.5px;
+    color:var(--rdr-ink-mute);text-transform:uppercase;letter-spacing:0.14em;
+  }
+  .row .v .person{
+    display:block;padding:6px 0;
+  }
+  .row .v .person + .person{border-top:1px dashed rgba(26,23,21,0.18);margin-top:6px;padding-top:10px}
+  .row .v a{color:var(--rdr-morado);text-decoration:none;border-bottom:1px solid var(--rdr-morado)}
+  .row .v a:hover{color:#e6195b;border-bottom-color:#e6195b}
+
+  .ficha-footer{
+    padding:18px 28px;border-top:1.5px solid var(--rdr-ink);
+    background:rgba(26,23,21,0.04);
+    display:flex;align-items:center;justify-content:space-between;gap:12px;
+  }
+  .nav-prev-next{display:flex;gap:8px}
+  .ctrl{
+    height:38px;padding:0 16px;border-radius:99px;
+    background:transparent;color:var(--rdr-ink);
+    border:1.5px solid var(--rdr-ink);cursor:pointer;
+    font-family:var(--rdr-font-display);font-weight:700;
+    text-transform:uppercase;font-size:12px;letter-spacing:0.06em;
+    display:inline-flex;align-items:center;gap:6px;
+    transition:all .14s var(--rdr-ease);
+  }
+  .ctrl:hover{background:var(--rdr-ink);color:#fff}
+  .ctrl.primary{background:#e6195b;border-color:var(--rdr-ink);color:#fff}
+  .ctrl.primary:hover{background:var(--rdr-ink)}
+  .counter{
+    font-family:var(--rdr-font-mono);font-size:11px;
+    text-transform:uppercase;letter-spacing:0.16em;color:var(--rdr-ink-mute);
+  }
+  .counter b{color:#e6195b;font-weight:700}
+
+  @media (max-width:1080px){
+    main{grid-template-columns:1fr}
+  }
+</style>
+</head>
+<body>
+
+<div class="a11y-strip">
+  <a href="#contenido" class="skip">Saltar al contenido</a>
+  <div class="rdr-a11y-nav" aria-label="Accesibilidad">
+    <span>Tamaño</span>
+    <button>A−</button><button>A</button><button>A+</button>
+    <button style="width:auto;padding:0 12px;height:26px;font-size:10px">Alto contraste</button>
+  </div>
+</div>
+
+<header class="top">
+  <div class="brand">
+    <div class="eye">Ministerio de las Culturas, las Artes y los Saberes</div>
+    <h1>Red <em>de redes</em></h1>
+    <div class="doc"><b>Mapa de nodos priorizados</b> · Implementación 2026</div>
+  </div>
+  <div class="meta">
+    <div class="pulse">Mapa en construcción</div>
+    <div><b>3</b> nodos cargados de <b>5</b></div>
+    <div>Junio 15 — Julio 15 · 2026</div>
+  </div>
+</header>
+
+<main id="contenido">
+
+  <!-- ====== MAP ====== -->
+  <section class="stage">
+    <div class="stage-head">
+      <div>
+        <div class="lbl">Mapa · territorio nacional</div>
+        <h2>República de <em>Colombia</em></h2>
+      </div>
+      <div class="legend">
+        <span>Nodo seleccionado <i style="background:#e6195b"></i></span>
+        <span>Nodo priorizado <i style="background:var(--rdr-morado)"></i></span>
+        <span>Capital <i style="background:transparent;border:1.5px solid #1a1715"></i></span>
+      </div>
+    </div>
+
+    <div class="map-loading" id="loading">
+      <div class="spinner"></div>
+      <div>Cargando geografía · Colombia</div>
+    </div>
+
+    <svg class="map-svg" id="mapSvg" viewBox="0 0 880 880" preserveAspectRatio="xMidYMid meet">
+      <defs>
+        <filter id="ink"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" seed="9"/><feDisplacementMap in="SourceGraphic" scale="0.6"/></filter>
+      </defs>
+      <g id="depts" fill="rgba(234,217,204,0.4)" stroke="rgba(26,23,21,0.35)" stroke-width="0.7" stroke-linejoin="round"></g>
+      <path id="outline" fill="none" stroke="var(--rdr-ink)" stroke-width="1.6" stroke-linejoin="round"></path>
+
+      <!-- mesh: subtle connections from each nodo to capital -->
+      <g id="axons" stroke="#4a2a7a" stroke-width="1.0" fill="none" stroke-opacity="0.55" stroke-dasharray="3 4"></g>
+    </svg>
+
+    <div class="nodes" id="nodesLayer"></div>
+
+    <div class="map-attrib">geo · DANE / John Guerra</div>
+    <div class="scale"><span class="bar"></span></div>
+    <div class="compass"></div>
+  </section>
+
+  <!-- ====== FICHA ====== -->
+  <aside class="ficha" id="ficha"></aside>
+
+</main>
+
+<script>
+/* =====================================================================
+   NODES — datos reales según correos de Mincultura (Dirección de
+   Poblaciones + DACMI). Solo estos 3 son interactivos.
+===================================================================== */
+const nodos = [
+  {
+    id:'cucuta',
+    lon:-72.50, lat:7.89, city:'Cúcuta',
+    red:'RADAR',
+    redLong:'Asociación de Radios Comunitarias de Norte de Santander — RADAR',
+    departamento:'Norte de Santander',
+    representantes:[
+      {nombre:'Carlos Elí Guevara', rol:'Representante legal', tel:'320 342 0440'},
+      {nombre:'Martha Isabel Martínez', rol:'Formación y proyectos en la Red Radar', tel:'313 807 1095'},
+    ],
+    correo:'radarnds@gmail.com',
+    web:'https://radarenlared.com/',
+    organizaciones:25,
+    fortaleza:'Acompaña y fortalece las radios comunitarias del departamento. Las 25 emisoras cubren Cúcuta, Ocaña, El Tarra, La Gabarra, Convención y otros 20 municipios — una articulación que conecta producción colaborativa, formación de equipos, gestión de proyectos regionales y representación del sector ante MinTIC.',
+    delegados:[
+      {nombre:'Óscar Javier Bermúdez', rol:'Delegado Mincultura · DACMI'},
+      {nombre:'Yesenia Polanía', rol:'Delegada Mincultura · DACMI'},
+    ],
+    grupo:'DACMI · Grupo de Comunicación, Culturas y Territorios',
+    fecha:'Finales de julio · 2026',
+    fechaNote:'Posibilidad de visitar emisoras cercanas a Cúcuta y El Zulia',
+    lugar:'Cúcuta',
+    direccion:'Av. 5 # 9-58 Ed. Mutuo Auxilio of. 702',
+  },
+  {
+    id:'quibdo',
+    lon:-76.66, lat:5.69, city:'Quibdó',
+    red:'Mujeres del Chocó',
+    redLong:'Red de mujeres artistas, cultoras y sabedoras del Chocó',
+    departamento:'Chocó',
+    representantes:[
+      {nombre:'Nelly Caizamo', rol:'Lideresa', tel:'321 840 3767'},
+    ],
+    correo:'',
+    web:'',
+    organizaciones:15,
+    fortaleza:'Cuidado de la paz y articulación con el fortalecimiento de la Red Internacional de Mujeres artistas, cultoras y sabedoras por la paz.',
+    delegados:[
+      {nombre:'Alba Cecilia Pineda', rol:'Delegada Mincultura · Dirección de Poblaciones'},
+      {nombre:'Alejandra Ballén', rol:'Delegada Mincultura · Dirección de Poblaciones'},
+    ],
+    grupo:'Dirección de Poblaciones',
+    fecha:'18 de junio · 2026',
+    fechaNote:'Tentativa, a concertar con organizaciones',
+    lugar:'Quibdó',
+    direccion:'Por confirmar',
+  },
+  {
+    id:'neiva',
+    lon:-75.28, lat:2.94, city:'Neiva',
+    red:'Juntanza de Jóvenes',
+    redLong:'Juntanza de Jóvenes — Minga del Suroccidente',
+    departamento:'Huila',
+    representantes:[
+      {nombre:'Yiner Quiguantar Cortés', rol:'Vocero', tel:'322 687 0655'},
+    ],
+    correo:'',
+    web:'',
+    organizaciones:40,
+    fortaleza:'Inciden en las decisiones que afectan a las juventudes desde la movilización pacífica, la construcción y resistencia cultural, artística, política y social; defienden la vida, los derechos humanos, el territorio y la paz.',
+    delegados:[
+      {nombre:'William Aguilera', rol:'Delegado Mincultura · Dirección de Poblaciones'},
+    ],
+    grupo:'Dirección de Poblaciones',
+    fecha:'15 de julio · 2026',
+    fechaNote:'Tentativa, a concertar con organizaciones',
+    lugar:'Neiva',
+    direccion:'Por confirmar',
+  },
+];
+
+const bogota = {lon:-74.08, lat:4.61};
+
+/* =====================================================================
+   PROJECTION + MAP RENDER
+   Cargamos GeoJSON real desde el gist de John Guerra (público).
+===================================================================== */
+const W=880, H=880;
+const PAD = 40;
+const GEO_URL = 'https://gist.githubusercontent.com/john-guerra/43c7656821069d00dcbc/raw/be6a6e239cd5b5b803c6e7c2ec405b793a9064dd/Colombia.geo.json';
+
+let projector = null;
+
+async function loadMap(){
+  let geo;
+  try{
+    const res = await fetch(GEO_URL);
+    if(!res.ok) throw new Error('HTTP '+res.status);
+    geo = await res.json();
+  }catch(err){
+    console.error('Falló carga de GeoJSON, usando fallback', err);
+    document.getElementById('loading').innerHTML =
+      '<div style="color:#e6195b">⚠ No se pudo cargar el mapa</div>'+
+      '<div style="font-size:10px">Revisa la conexión y recarga</div>';
+    return;
+  }
+
+  /* compute bounds — pero ignoramos San Andrés (las islas, lon < -79)
+     para no comprimir el continente. San Andrés queda fuera del recorte. */
+  let minLon=Infinity,maxLon=-Infinity,minLat=Infinity,maxLat=-Infinity;
+  function eachPt(coords, fn){
+    if(typeof coords[0]==='number'){ fn(coords); return; }
+    coords.forEach(c=>eachPt(c,fn));
+  }
+  geo.features.forEach(f=>{
+    eachPt(f.geometry.coordinates, ([lon,lat])=>{
+      // skip island archipelago for bounds calc
+      if(lon < -79.5) return;
+      if(lon<minLon)minLon=lon; if(lon>maxLon)maxLon=lon;
+      if(lat<minLat)minLat=lat; if(lat>maxLat)maxLat=lat;
+    });
+  });
+
+  /* simple equirectangular fit, latitude-corrected */
+  const midLat = (minLat+maxLat)/2;
+  const cosLat = Math.cos(midLat * Math.PI/180);
+  const lonRange = (maxLon-minLon) * cosLat;
+  const latRange = (maxLat-minLat);
+
+  const aw = W - 2*PAD;
+  const ah = H - 2*PAD;
+  // scale to fit
+  const sx = aw / lonRange;
+  const sy = ah / latRange;
+  const s = Math.min(sx, sy) * 0.96;
+  const ox = PAD + (aw - lonRange*s)/2;
+  const oy = PAD + (ah - latRange*s)/2;
+
+  projector = function(lon, lat){
+    const x = ox + (lon - minLon) * cosLat * s;
+    const y = oy + (maxLat - lat) * s;
+    return {x, y};
+  };
+
+  /* render department polygons — saltarse San Andrés (toda costa lon<-79.5)
+     porque queda fuera del recorte y rompe el clip */
+  const depts = document.getElementById('depts');
+  let deptHTML = '';
+  geo.features.forEach((f, i)=>{
+    const g = f.geometry;
+    const polys = g.type==='Polygon' ? [g.coordinates] : g.coordinates;
+    polys.forEach(poly=>{
+      // skip if first ring is entirely in island lon range
+      const firstPt = poly[0][0];
+      if(firstPt[0] < -79.5) return;
+      let d='';
+      poly.forEach(ring=>{
+        ring.forEach(([lon,lat], k)=>{
+          const p = projector(lon,lat);
+          d += (k===0?'M':'L') + p.x.toFixed(1) + ',' + p.y.toFixed(1);
+        });
+        d += 'Z';
+      });
+      deptHTML += `<path d="${d}"></path>`;
+    });
+  });
+  depts.innerHTML = deptHTML;
+
+  /* render outer outline by drawing a thicker stroke around each polygon */
+  // (we already get departmental seams from depts; outline is the same paths
+  //  rendered with ink stroke on top — handled above)
+
+  /* axons cap → nodos (subtle) */
+  const cap = projector(bogota.lon, bogota.lat);
+  let axHTML = '';
+  nodos.forEach(n=>{
+    const p = projector(n.lon, n.lat);
+    const mx = (cap.x+p.x)/2, my = (cap.y+p.y)/2;
+    const dx = p.x-cap.x, dy = p.y-cap.y;
+    const off = 30 + Math.random()*20;
+    const nx = -dy, ny = dx, nl = Math.hypot(nx,ny)||1;
+    const cx = mx + (nx/nl)*off, cy = my + (ny/nl)*off;
+    axHTML += `<path d="M${cap.x.toFixed(1)},${cap.y.toFixed(1)} Q${cx.toFixed(1)},${cy.toFixed(1)} ${p.x.toFixed(1)},${p.y.toFixed(1)}"/>`;
+  });
+  document.getElementById('axons').innerHTML = axHTML;
+
+  /* place nodes */
+  const layer = document.getElementById('nodesLayer');
+  let html = '';
+  // Capital reference (small ring, non-clickable)
+  html += `<div class="capital-ref" style="left:${cap.x}px;top:${cap.y}px"></div>`;
+
+  nodos.forEach((n, i)=>{
+    const p = projector(n.lon, n.lat);
+    n._x = p.x; n._y = p.y;
+    const labelClass = n.id==='cucuta' ? '' : 'left'; // cucuta is far right, label goes right; others to the left
+    html += `<button class="node nodo ${i===0?'selected':''}" data-id="${n.id}" style="left:${p.x}px;top:${p.y}px" aria-label="${n.city} — ${n.red}"></button>`;
+    html += `<div class="node-label ${labelClass} ${i===0?'selected':''}" data-label-id="${n.id}" style="left:${p.x}px;top:${p.y}px">${n.city}<small>${n.red}</small></div>`;
+  });
+  layer.innerHTML = html;
+
+  // wire clicks
+  document.querySelectorAll('.node.nodo').forEach(el=>{
+    el.addEventListener('click', ()=> select(el.dataset.id));
+  });
+
+  document.getElementById('loading').style.display='none';
+}
+
+/* =====================================================================
+   FICHA RENDERING
+===================================================================== */
+const ficha = document.getElementById('ficha');
+let current = 0;
+
+function renderFicha(){
+  const n = nodos[current];
+
+  const repsHTML = n.representantes.map(r=>
+    `<span class="person"><b>${r.nombre}</b><small>${r.rol} · ${r.tel}</small></span>`
+  ).join('');
+
+  const delsHTML = n.delegados.map(d=>
+    `<span class="person"><b>${d.nombre}</b><small>${d.rol}</small></span>`
+  ).join('');
+
+  const contactoExtra = [];
+  if(n.correo) contactoExtra.push(`<a href="mailto:${n.correo}">${n.correo}</a>`);
+  if(n.web) contactoExtra.push(`<a href="${n.web}" target="_blank" rel="noopener">${n.web.replace(/^https?:\/\//,'')}</a>`);
+
+  ficha.innerHTML = `
+    <div class="ficha-hero">
+      <div class="eye">Nodo priorizado · ${String(current+1).padStart(2,'0')} de ${String(nodos.length).padStart(2,'0')}</div>
+      <h3>${n.redLong.replace(/—/, '<em>—</em>')}</h3>
+      <div class="lugar">${n.city} · ${n.departamento}</div>
+    </div>
+
+    <div class="ficha-body">
+
+      <div class="row">
+        <div class="k">El nodo</div>
+        <div class="v lead">${n.fortaleza}</div>
+      </div>
+
+      <div class="row">
+        <div class="k">Representa</div>
+        <div class="v"><span class="num">${n.organizaciones}</span> organizaciones agrupadas en torno al nodo<small>${n.red}</small></div>
+      </div>
+
+      <div class="row">
+        <div class="k">Representante${n.representantes.length>1?'s':''} del nodo</div>
+        <div class="v">${repsHTML}${contactoExtra.length?`<small style="margin-top:8px">${contactoExtra.join(' · ')}</small>`:''}</div>
+      </div>
+
+      <div class="row">
+        <div class="k">Ubicación</div>
+        <div class="v">${n.city}, ${n.departamento}<small>${n.direccion}</small></div>
+      </div>
+
+      <div class="row">
+        <div class="k">Equipo Mincultura</div>
+        <div class="v">${delsHTML}<small style="margin-top:8px">${n.grupo}</small></div>
+      </div>
+
+      <div class="row">
+        <div class="k">Encuentro</div>
+        <div class="v"><b>${n.fecha}</b><small>${n.fechaNote}</small></div>
+      </div>
+
+    </div>
+
+    <div class="ficha-footer">
+      <div class="counter">Nodo <b>${String(current+1).padStart(2,'0')}</b> · de ${String(nodos.length).padStart(2,'0')}</div>
+      <div class="nav-prev-next">
+        <button class="ctrl" id="prevBtn">← Anterior</button>
+        <button class="ctrl primary" id="nextBtn">Siguiente →</button>
+      </div>
+    </div>
+  `;
+
+  document.getElementById('prevBtn').onclick = ()=>{ const ni = (current-1+nodos.length)%nodos.length; select(nodos[ni].id); };
+  document.getElementById('nextBtn').onclick = ()=>{ const ni = (current+1)%nodos.length; select(nodos[ni].id); };
+}
+
+function select(id){
+  current = nodos.findIndex(n=>n.id===id);
+  document.querySelectorAll('.node.nodo').forEach(el=>{
+    el.classList.toggle('selected', el.dataset.id===id);
+  });
+  document.querySelectorAll('.node-label').forEach(el=>{
+    el.classList.toggle('selected', el.dataset.labelId===id);
+  });
+  renderFicha();
+}
+
+renderFicha();
+loadMap();
+</script>
+
+</body>
+</html>

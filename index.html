@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="es-CO">
+<head>
+<meta charset="utf-8">
+<title>Red de redes · Minculturas</title>
+<meta http-equiv="refresh" content="0; url=ui_kits/red_de_redes/index.html">
+<link rel="stylesheet" href="colors_and_type.css">
+<style>
+  body{
+    margin:0; padding:48px 36px;
+    font-family:var(--rdr-font-body); color:var(--rdr-ink);
+    background:
+      radial-gradient(1000px 600px at 0% 0%, #ece6da 0%, transparent 60%),
+      radial-gradient(800px 500px at 100% 100%, #d6cfc1 0%, transparent 65%),
+      #dad3c4;
+    min-height:100vh;
+  }
+  h1{
+    font-family:var(--rdr-font-display); font-weight:700; text-transform:uppercase;
+    font-size:64px; line-height:0.9; letter-spacing:0.005em; margin:0 0 18px;
+  }
+  h1 em{ font-family:var(--rdr-font-editorial); font-style:italic; font-weight:400;
+    text-transform:none; letter-spacing:-0.012em; color:#e6195b }
+  p{font-size:16px; max-width:62ch; line-height:1.5}
+  ul{list-style:none; padding:0; margin:24px 0; display:grid; grid-template-columns:repeat(2,minmax(280px,1fr)); gap:12px; max-width:780px}
+  li a{
+    display:block; padding:18px 22px;
+    border:1.5px solid var(--rdr-ink); border-radius:14px;
+    background:rgba(244,240,232,0.6); text-decoration:none;
+    color:var(--rdr-ink); font-family:var(--rdr-font-display);
+    font-weight:600; text-transform:uppercase; font-size:18px;
+    letter-spacing:0.005em;
+    transition:all .15s var(--rdr-ease);
+  }
+  li a:hover{ background:#e6195b; color:#fff; border-color:#e6195b }
+  li a small{
+    display:block; margin-top:6px;
+    font-family:var(--rdr-font-mono); font-size:10.5px; font-weight:500;
+    text-transform:uppercase; letter-spacing:0.16em; color:var(--rdr-ink-mute);
+  }
+  li a:hover small{ color:rgba(255,255,255,0.85) }
+  .eye{
+    font-family:var(--rdr-font-mono); font-size:11px;
+    text-transform:uppercase; letter-spacing:0.16em; color:#e6195b;
+    margin-bottom:12px; display:inline-flex; align-items:center; gap:8px;
+  }
+  .eye::before{content:"";width:8px;height:8px;border-radius:99px;background:#e6195b;box-shadow:0 0 0 3px rgba(230,25,91,0.25)}
+</style>
+</head>
+<body>
+  <div class="eye">design system · v0.4</div>
+  <h1>Red <em>de redes</em></h1>
+  <p>Mapa vivo del tejido cultural de Colombia. Mapa geo-referenciado del territorio con los nodos locales priorizados por el Ministerio de las Culturas, las Artes y los Saberes para la implementación 2026.</p>
+  <ul>
+    <li><a href="ui_kits/red_de_redes/index.html">Mapa Implementación 2026<small>3 nodos · Neiva · Quibdó · Cúcuta</small></a></li>
+  </ul>
+</body>
+</html>

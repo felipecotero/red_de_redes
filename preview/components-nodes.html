@@ -1,0 +1,507 @@
+<!doctype html>
+<html lang="es-CO">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  body{
+    background:
+      radial-gradient(800px 500px at 0% 0%,#ece6da 0%,transparent 60%),
+      radial-gradient(700px 500px at 100% 100%,#d6cfc1 0%,transparent 65%),
+      #dad3c4;
+    padding:22px; min-height:100vh;
+    font-family:var(--rdr-font-body); color:var(--rdr-ink);
+  }
+  .head{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:16px;gap:24px;max-width:920px}
+  .eye{
+    font-family:var(--rdr-font-mono); font-size:10.5px;
+    text-transform:uppercase; letter-spacing:0.16em; color:#e6195b;
+    display:inline-flex; align-items:center; gap:8px; margin-bottom:6px;
+  }
+  .eye::before{content:"";width:7px;height:7px;border-radius:99px;background:#e6195b;box-shadow:0 0 0 3px rgba(230,25,91,.25)}
+  h1{
+    font-family:var(--rdr-font-display); font-weight:700; text-transform:uppercase;
+    font-size:36px; line-height:0.9; letter-spacing:0.005em; color:var(--rdr-ink);
+  }
+  h1 em{ font-family:var(--rdr-font-editorial); font-style:italic; font-weight:400;
+    text-transform:none; letter-spacing:-0.012em; color:var(--rdr-morado) }
+  .meta{
+    font-family:var(--rdr-font-mono); font-size:10.5px; text-transform:uppercase;
+    letter-spacing:0.16em; color:var(--rdr-ink-mute); text-align:right;
+  }
+  .meta b{color:var(--rdr-ink); font-weight:600}
+
+  .stage{
+    position:relative;
+    width:920px; height:760px;
+    background:
+      radial-gradient(700px 500px at 40% 38%,#efe9da 0%,transparent 70%),
+      #d3ccbd;
+    border:1.5px solid var(--rdr-ink);
+    border-radius:14px;
+    overflow:hidden;
+    box-shadow:0 24px 60px rgba(26,23,21,.10);
+  }
+
+  /* paper grain */
+  .stage::before{
+    content:""; position:absolute; inset:0;
+    background-image:
+      radial-gradient(circle at 20% 30%, rgba(26,23,21,.025) 0, transparent 1.5px),
+      radial-gradient(circle at 70% 60%, rgba(26,23,21,.022) 0, transparent 1.5px),
+      radial-gradient(circle at 40% 80%, rgba(26,23,21,.02) 0, transparent 1.5px);
+    background-size:7px 7px,11px 11px,13px 13px;
+    mix-blend-mode:multiply; opacity:.6; pointer-events:none;
+  }
+
+  .legend{
+    position:absolute; top:18px; right:20px; z-index:20;
+    display:flex; flex-direction:column; gap:5px;
+    font-family:var(--rdr-font-mono); font-size:10px;
+    color:var(--rdr-ink-soft); text-transform:uppercase;
+    letter-spacing:0.16em; text-align:right; align-items:flex-end;
+    background:rgba(244,240,232,0.6); padding:10px 12px;
+    border:1px solid var(--rdr-ink); border-radius:8px;
+  }
+  .legend span{display:inline-flex;align-items:center;gap:8px}
+  .legend i{width:8px;height:8px;border-radius:99px;border:1px solid rgba(26,23,21,.6)}
+
+  .corner-tag{
+    position:absolute; bottom:18px; left:120px; z-index:20;
+    background:#e6195b; color:#fff;
+    font-family:var(--rdr-font-mono); font-size:10px;
+    text-transform:uppercase; letter-spacing:0.18em;
+    padding:6px 14px; border-radius:99px;
+    border:1.5px solid var(--rdr-ink);
+  }
+
+  /* compass */
+  .compass{
+    position:absolute; bottom:18px; right:22px; z-index:20;
+    width:56px; height:56px; border-radius:99px;
+    border:1.5px solid var(--rdr-ink); background:rgba(244,240,232,0.6);
+    display:flex; align-items:center; justify-content:center;
+    font-family:var(--rdr-font-display); font-weight:700; font-size:13px;
+    color:var(--rdr-ink); letter-spacing:0.08em;
+  }
+  .compass::before{
+    content:"N"; position:absolute; top:6px; color:#e6195b;
+  }
+  .compass::after{
+    content:""; position:absolute; left:50%; top:14px;
+    width:0;height:0; border:5px solid transparent; border-bottom-color:#e6195b;
+    transform:translateX(-50%);
+  }
+
+  /* scale bar */
+  .scale{
+    position:absolute; bottom:22px; left:24px; z-index:20;
+    display:flex; align-items:center; gap:8px;
+    font-family:var(--rdr-font-mono); font-size:9.5px;
+    text-transform:uppercase; letter-spacing:0.16em; color:var(--rdr-ink-mute);
+  }
+  .scale .bar{
+    display:inline-block; width:80px; height:6px;
+    background:linear-gradient(90deg,var(--rdr-ink) 50%, transparent 50%) 0/20px 6px,
+               var(--rdr-ink);
+    background-clip:content-box, padding-box;
+    border:1.5px solid var(--rdr-ink); position:relative;
+  }
+  .scale .bar::before{
+    content:"0  ·  250  ·  500 km"; position:absolute; top:9px; left:0;
+    white-space:nowrap;
+  }
+
+  /* SVG layers */
+  .map-svg{position:absolute; inset:0; width:100%; height:100%; z-index:1}
+  .nodes-layer{position:absolute; inset:0; z-index:3}
+
+  /* node base */
+  .node{
+    position:absolute; transform:translate(-50%,-50%);
+    border-radius:99px; cursor:pointer;
+    transition:transform .25s var(--rdr-ease);
+    z-index:4;
+  }
+  .node:hover{transform:translate(-50%,-50%) scale(1.5); z-index:30}
+  .node.cap{
+    width:24px; height:24px; background:#e6195b;
+    border:2px solid var(--rdr-ink);
+    box-shadow:0 0 0 5px rgba(230,25,91,.18);
+    z-index:6;
+  }
+  .node.cap::after{
+    content:""; position:absolute; inset:0; border-radius:99px;
+    box-shadow:0 0 0 0 rgba(230,25,91,.55);
+    animation:pulse 2.4s ease-out infinite;
+  }
+  @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(230,25,91,.55)}100%{box-shadow:0 0 0 26px rgba(230,25,91,0)}}
+
+  .node.entidad{ width:14px; height:14px; background:var(--rdr-ink); border:1.5px solid var(--rdr-ink) }
+  .node.entidad.morado{ background:var(--rdr-morado) }
+  .node.entidad.azul  { background:var(--rdr-azul-noche) }
+  .node.entidad.teal  { background:var(--rdr-cyan-mark) }
+  .node.entidad.verde { background:var(--rdr-verde) }
+  .node.entidad.mostaza{background:var(--rdr-mostaza) }
+
+  .node.local{
+    width:7px; height:7px; background:var(--rdr-paper-pure);
+    border:1.5px solid var(--rdr-ink);
+  }
+  .node.dust{ width:3px; height:3px; background:rgba(26,23,21,.55) }
+
+  .label{
+    position:absolute; transform:translate(-50%, 14px);
+    font-family:var(--rdr-font-display); font-weight:600;
+    text-transform:uppercase; font-size:11px; line-height:1;
+    letter-spacing:0.04em; color:var(--rdr-ink); white-space:nowrap;
+    pointer-events:none; text-align:center;
+  }
+  .label small{
+    display:block; margin-top:3px;
+    font-family:var(--rdr-font-mono); font-size:9px;
+    color:var(--rdr-ink-mute); letter-spacing:0.12em; font-weight:500;
+  }
+  .label.bog{
+    background:#e6195b; color:#fff; padding:4px 10px; border-radius:99px;
+    border:1.5px solid var(--rdr-ink);
+    transform:translate(-50%, 18px);
+  }
+  .label.bog small{color:rgba(255,255,255,0.85)}
+
+  /* tooltip */
+  .tip{
+    position:absolute; transform:translate(-50%, calc(-100% - 14px));
+    background:var(--rdr-ink); color:#fff;
+    padding:6px 10px; border-radius:4px;
+    font-family:var(--rdr-font-mono); font-size:10px;
+    text-transform:uppercase; letter-spacing:0.16em;
+    white-space:nowrap; pointer-events:none; opacity:0;
+    transition:opacity .15s var(--rdr-ease); z-index:50;
+  }
+  .node:hover .tip{opacity:1}
+</style>
+</head>
+<body>
+
+<div class="head">
+  <div>
+    <div class="eye">componente · mapa de nodos</div>
+    <h1>Tejido sobre <em>Colombia</em></h1>
+  </div>
+  <div class="meta">
+    <div><b>v0.4</b> — geo-referenciado</div>
+    <div>cap · entidades · nodos locales</div>
+  </div>
+</div>
+
+<div class="stage">
+  <span class="corner-tag">señal viva · 2024</span>
+  <div class="legend">
+    <span>Casa Común<i style="background:#e6195b"></i></span>
+    <span>Entidad adscrita<i style="background:var(--rdr-ink)"></i></span>
+    <span>Nodo local<i style="background:var(--rdr-paper-pure)"></i></span>
+  </div>
+
+  <svg class="map-svg" viewBox="0 0 920 760" preserveAspectRatio="none">
+    <defs>
+      <filter id="ink"><feTurbulence type="fractalNoise" baseFrequency="1.1" numOctaves="2" seed="9"/><feDisplacementMap in="SourceGraphic" scale="1.4"/></filter>
+      <filter id="inkSoft"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" seed="5"/><feDisplacementMap in="SourceGraphic" scale="0.9"/></filter>
+    </defs>
+
+    <!-- COLOMBIA SILHOUETTE — drawn from the tejido itself: ink fill + ink stroke -->
+    <path id="colombia" d="" fill="rgba(26,23,21,0.06)" stroke="var(--rdr-ink)" stroke-width="1.4" filter="url(#inkSoft)"/>
+
+    <!-- internal department/regional hairlines, very faint -->
+    <g id="regions" stroke="rgba(26,23,21,0.18)" stroke-width="0.5" fill="none" stroke-dasharray="2 4" filter="url(#inkSoft)"></g>
+
+    <!-- mesh layers -->
+    <g id="meshFaint"  stroke="rgba(26,23,21,0.10)" stroke-width="0.45" fill="none" filter="url(#ink)"></g>
+    <g id="mesh"       stroke="rgba(26,23,21,0.32)" stroke-width="0.65" fill="none" filter="url(#ink)"></g>
+    <g id="axonMorado" stroke="#4a2a7a"             stroke-width="0.95" fill="none" filter="url(#ink)" stroke-opacity="0.85"></g>
+    <g id="axonMagenta"stroke="#e6195b"             stroke-width="1.3"  fill="none" filter="url(#ink)" stroke-opacity="0.9"></g>
+  </svg>
+
+  <div class="nodes-layer" id="nodes"></div>
+
+  <div class="scale"><span class="bar"></span></div>
+  <div class="compass"></div>
+</div>
+
+<script>
+/* =====================================================================
+   Geographic projection.
+   Colombia roughly spans:
+     longitude:  -79°  (west)  ..  -67°  (east)        — span 12°
+     latitude:    -4.2° (south) ..  13.4° (north)      — span 17.6°
+
+   We map this to a viewport (W=920, H=760) but keep some padding so
+   the silhouette doesn't kiss the edges, and we leave more room on
+   the right for the Orinoquía/Amazonía panhandle.
+===================================================================== */
+const W=920, H=760;
+const PAD_X=80, PAD_Y=70;
+const LON_MIN=-79.2, LON_MAX=-66.8;
+const LAT_MIN=-4.5,  LAT_MAX=13.6;
+
+function proj(lon,lat){
+  const x = PAD_X + (lon - LON_MIN)/(LON_MAX-LON_MIN) * (W - 2*PAD_X);
+  const y = PAD_Y + (LAT_MAX - lat)/(LAT_MAX-LAT_MIN) * (H - 2*PAD_Y);
+  return {x,y};
+}
+
+/* ---- Colombia outline (hand-traced approximate, lon/lat pairs) ----
+   Goes clockwise from La Guajira → north coast → Panamá border →
+   Pacific coast → Ecuador → Amazonía panhandle → Brazil → Venezuela →
+   back to Guajira. Coarse but recognizable. */
+const outline = [
+  [-71.7, 12.5],  // Punta Gallinas (Guajira)
+  [-72.7, 11.7],
+  [-74.2, 11.2],  // Santa Marta
+  [-75.5, 10.4],  // Cartagena
+  [-76.4, 9.4],   // Golfo de Urabá
+  [-77.3, 8.7],
+  [-77.5, 7.9],   // border Panamá
+  [-77.9, 7.2],
+  [-77.4, 5.7],   // Bahía Solano
+  [-77.6, 4.3],   // Buenaventura coast
+  [-78.9, 2.6],   // Tumaco
+  [-78.5, 1.4],   // border Ecuador (Pacific)
+  [-77.1, 0.7],   // Ipiales
+  [-75.3, 0.5],   // Putumayo
+  [-74.1, -0.6],
+  [-72.3, -2.3],  // Leticia approach
+  [-69.9, -4.2],  // Leticia (south tip)
+  [-69.6, -1.2],
+  [-69.7,  1.2],
+  [-67.9,  1.3],
+  [-67.1,  1.7],
+  [-67.5,  2.6],
+  [-67.4,  3.7],
+  [-67.9,  4.5],  // border w/ Venezuela (south)
+  [-67.4,  6.2],
+  [-69.4,  6.1],
+  [-70.1,  6.9],
+  [-71.1,  6.9],
+  [-72.0,  7.4],
+  [-72.4,  8.4],  // Cúcuta
+  [-72.9,  9.1],
+  [-72.8, 10.1],
+  [-71.9, 11.6],  // back to Guajira
+  [-71.7, 12.5],
+];
+
+let dPath="";
+outline.forEach((pt,i)=>{
+  const p=proj(pt[0],pt[1]);
+  dPath += (i===0?"M":"L") + p.x.toFixed(1) + "," + p.y.toFixed(1);
+});
+dPath += " Z";
+document.getElementById('colombia').setAttribute('d', dPath);
+
+/* ---- Internal regional hairlines (very rough, just for atlas feel) ---- */
+const regionLines = [
+  // Andes (3 cordilleras schematic)
+  [[-77.3, 1.0],[-76.5, 2.4],[-75.5, 4.0],[-75.6, 5.8],[-75.7, 7.4],[-76.3, 8.5]],
+  [[-75.5, 1.3],[-74.8, 3.2],[-74.0, 4.7],[-73.5, 6.1],[-73.2, 7.6]],
+  [[-73.8, 1.2],[-73.0, 3.0],[-72.4, 4.8],[-72.4, 6.6],[-72.6, 8.2]],
+  // Orinoco-Amazonas divide
+  [[-70.0, 5.0],[-71.0, 3.5],[-72.0, 2.0],[-72.5, 0.0],[-71.0, -2.5]],
+  // Magdalena valley axis
+  [[-74.7, 9.5],[-74.4, 7.5],[-74.7, 5.5],[-75.0, 3.5]],
+];
+let regHTML="";
+regionLines.forEach(line=>{
+  let d="";
+  line.forEach((pt,i)=>{ const p=proj(pt[0],pt[1]); d+=(i===0?"M":"L")+p.x.toFixed(1)+","+p.y.toFixed(1); });
+  regHTML += `<path d="${d}"/>`;
+});
+document.getElementById('regions').innerHTML = regHTML;
+
+/* ---------------- Geo-referenced organizations ----------------
+   Each sits on its real city/coordinates.
+   kind: cap | entidad | local
+   color (entidad only): morado|azul|teal|verde|mostaza|ink
+*/
+const orgs = [
+  // CAPITAL — Casa Común (Ministerio sits in Bogotá but is "the center")
+  {city:'Bogotá',         lon:-74.08, lat:4.61, kind:'cap',    label:'Casa Común', sub:'Ministerio'},
+
+  // ENTIDADES ADSCRITAS — all sit in Bogotá, fanned out as a satellite ring
+  // around the cap (no individual labels; leader-line callout to right margin)
+  {city:'Bogotá', lon:-74.08, lat:4.61, kind:'entidad', color:'ink',     ring:true, ang:  0, name:'Biblioteca Nac.'},
+  {city:'Bogotá', lon:-74.08, lat:4.61, kind:'entidad', color:'morado',  ring:true, ang: 45, name:'Caro y Cuervo'},
+  {city:'Bogotá', lon:-74.08, lat:4.61, kind:'entidad', color:'azul',    ring:true, ang: 90, name:'Museo Nacional'},
+  {city:'Bogotá', lon:-74.08, lat:4.61, kind:'entidad', color:'verde',   ring:true, ang:135, name:'ICANH'},
+  {city:'Bogotá', lon:-74.08, lat:4.61, kind:'entidad', color:'teal',    ring:true, ang:180, name:'Cinemateca'},
+  {city:'Bogotá', lon:-74.08, lat:4.61, kind:'entidad', color:'mostaza', ring:true, ang:225, name:'Idartes'},
+  {city:'Bogotá', lon:-74.08, lat:4.61, kind:'entidad', color:'morado',  ring:true, ang:315, name:'Archivo Gral.'},
+
+  // NODOS LOCALES — real cities across Colombia (no labels by default)
+  {city:'Cartagena',      lon:-75.51, lat:10.39, kind:'local',  label:'Cartagena',  sub:'Memoria viva'},
+  {city:'Santa Marta',    lon:-74.20, lat:11.24, kind:'local'},
+  {city:'Riohacha',       lon:-72.91, lat:11.54, kind:'local'},
+  {city:'Valledupar',     lon:-73.25, lat:10.46, kind:'local'},
+  {city:'Barranquilla',   lon:-74.78, lat:10.96, kind:'local'},
+  {city:'Sincelejo',      lon:-75.40, lat:9.30,  kind:'local'},
+  {city:'Montería',       lon:-75.88, lat:8.75,  kind:'local'},
+  {city:'Cúcuta',         lon:-72.50, lat:7.89,  kind:'local'},
+  {city:'Bucaramanga',    lon:-73.13, lat:7.13,  kind:'local'},
+  {city:'Tunja',          lon:-73.36, lat:5.54,  kind:'local'},
+  {city:'Yopal',          lon:-72.40, lat:5.34,  kind:'local'},
+  {city:'Villavicencio',  lon:-73.63, lat:4.14,  kind:'local'},
+  {city:'Ibagué',         lon:-75.20, lat:4.43,  kind:'local'},
+  {city:'Manizales',      lon:-75.51, lat:5.07,  kind:'local'},
+  {city:'Pereira',        lon:-75.69, lat:4.81,  kind:'local'},
+  {city:'Armenia',        lon:-75.68, lat:4.53,  kind:'local'},
+  {city:'Medellín',       lon:-75.57, lat:6.25,  kind:'local',  label:'Medellín', sub:'Cine comunitario'},
+  {city:'Apartadó',       lon:-76.63, lat:7.88,  kind:'local'},
+  {city:'Quibdó',         lon:-76.66, lat:5.69,  kind:'local',  label:'Quibdó',   sub:'Pacífico afro'},
+  {city:'Buenaventura',   lon:-77.04, lat:3.88,  kind:'local'},
+  {city:'Cali',           lon:-76.53, lat:3.45,  kind:'local'},
+  {city:'Popayán',        lon:-76.61, lat:2.44,  kind:'local'},
+  {city:'Tumaco',         lon:-78.78, lat:1.81,  kind:'local'},
+  {city:'Pasto',          lon:-77.28, lat:1.21,  kind:'local',  label:'Pasto',    sub:'Lenguas vivas'},
+  {city:'Ipiales',        lon:-77.64, lat:0.83,  kind:'local'},
+  {city:'Mocoa',          lon:-76.65, lat:1.15,  kind:'local'},
+  {city:'Florencia',      lon:-75.61, lat:1.61,  kind:'local'},
+  {city:'Neiva',          lon:-75.28, lat:2.94,  kind:'local'},
+  {city:'San Andrés (proxy)', lon:-72.5, lat:13.0, kind:'local'},
+  {city:'Mitú',           lon:-70.24, lat:1.20,  kind:'local'},
+  {city:'Inírida',        lon:-67.92, lat:3.86,  kind:'local'},
+  {city:'Pto. Carreño',   lon:-67.49, lat:6.19,  kind:'local'},
+  {city:'Leticia',        lon:-69.95, lat:-4.21, kind:'local'},
+  {city:'Arauca',         lon:-70.76, lat:7.08,  kind:'local'},
+  {city:'San Vicente CG', lon:-74.77, lat:2.13,  kind:'local'},
+];
+
+// project all orgs
+orgs.forEach(o => {
+  const p = proj(o.lon, o.lat); o.x=p.x; o.y=p.y;
+  // satellites in a ring around Bogotá
+  if (o.ring) {
+    const rad = (o.ang) * Math.PI/180;
+    const R = 32;
+    o.x += Math.cos(rad)*R;
+    o.y += Math.sin(rad)*R;
+  }
+});
+
+/* ---- Tejido (mesh) — connect orgs.
+   Density rules:
+     - cap connects to ALL entidades (strong magenta axons)
+     - cap connects to several locals (magenta, regional reach)
+     - each entidad connects to 5-7 nearest locals (morado axons)
+     - each local connects to its 2-3 nearest neighbors (faint/primary mesh)
+     - extra cross-region axons for organic neural feel
+*/
+let s=42; function rnd(){ s=(s*9301+49297)%233280; return s/233280; }
+function dist(a,b){return Math.hypot(a.x-b.x,a.y-b.y)}
+function bezier(a,b,maxOff=60){
+  const ax=a.x, ay=a.y, bx=b.x, by=b.y;
+  const mx=(ax+bx)/2, my=(ay+by)/2;
+  const dx=bx-ax, dy=by-ay;
+  const off=(rnd()-.5)*Math.min(maxOff, Math.hypot(dx,dy)*0.30);
+  const nx=-dy, ny=dx, nl=Math.hypot(nx,ny)||1;
+  const cx=mx+(nx/nl)*off, cy=my+(ny/nl)*off;
+  return `M${ax.toFixed(1)},${ay.toFixed(1)} Q${cx.toFixed(1)},${cy.toFixed(1)} ${bx.toFixed(1)},${by.toFixed(1)}`;
+}
+
+const cap = orgs.find(o=>o.kind==='cap');
+const entidades = orgs.filter(o=>o.kind==='entidad');
+const locales = orgs.filter(o=>o.kind==='local');
+
+let primary='', faint='', morado='', magenta='';
+
+// cap → entidades (all): magenta
+entidades.forEach(e => { magenta += `<path d="${bezier(cap, e, 30)}"/>`; });
+
+// cap → some locales: magenta, regional reach
+const farLocals = [...locales].sort((a,b)=>dist(cap,b)-dist(cap,a)).slice(0, 14);
+farLocals.forEach(l => { magenta += `<path d="${bezier(cap, l, 80)}"/>`; });
+
+// each entidad → its nearest locales: morado
+entidades.forEach(e => {
+  const nearest = [...locales].sort((a,b)=>dist(e,a)-dist(e,b)).slice(0, 6);
+  nearest.forEach(l => { morado += `<path d="${bezier(e, l, 60)}"/>`; });
+});
+
+// each local → its 3 nearest neighbors: primary mesh
+locales.forEach(l => {
+  const nearest = [...locales].filter(o=>o!==l).sort((a,b)=>dist(l,a)-dist(l,b)).slice(0, 3);
+  nearest.forEach(n => { primary += `<path d="${bezier(l, n, 40)}"/>`; });
+});
+
+// extra long cross-region axons for organic feel (faint)
+for(let i=0;i<80;i++){
+  const a = locales[Math.floor(rnd()*locales.length)];
+  const b = locales[Math.floor(rnd()*locales.length)];
+  if (a!==b) faint += `<path d="${bezier(a,b,90)}"/>`;
+}
+// dust connections from random points to cap, to thicken center
+for(let i=0;i<25;i++){
+  const a = locales[Math.floor(rnd()*locales.length)];
+  faint += `<path d="${bezier(a,cap,70)}"/>`;
+}
+
+document.getElementById('mesh').innerHTML       = primary;
+document.getElementById('meshFaint').innerHTML  = faint;
+document.getElementById('axonMorado').innerHTML = morado;
+document.getElementById('axonMagenta').innerHTML= magenta;
+
+/* ---- Render nodes + labels ---- */
+const layer = document.getElementById('nodes');
+let html = '';
+
+orgs.forEach(o => {
+  const cls = o.kind==='cap' ? 'node cap' :
+              o.kind==='entidad' ? `node entidad ${o.color||'ink'}` :
+              'node local';
+  html += `<button class="${cls}" style="left:${o.x.toFixed(1)}px;top:${o.y.toFixed(1)}px">
+            <span class="tip">${o.label||o.city}${o.sub?' · '+o.sub:''}</span>
+          </button>`;
+  if (o.label) {
+    const lblCls = o.kind==='cap' ? 'label bog' : 'label';
+    html += `<div class="${lblCls}" style="left:${o.x.toFixed(1)}px;top:${o.y.toFixed(1)}px">
+               ${o.label}<small>${o.sub||o.city}</small>
+             </div>`;
+  }
+});
+
+// Leader-line callout: stack the 7 entidades names in the right margin,
+// each connected to its satellite by a thin ink line.
+const capPt = orgs.find(o=>o.kind==='cap');
+const ringOrgs = orgs.filter(o=>o.ring);
+const calloutX = capPt.x + 200;  // right of Bogotá
+const calloutTop = capPt.y - (ringOrgs.length-1)*11;
+let leaders='';
+ringOrgs.forEach((e,i)=>{
+  const ly = calloutTop + i*22;
+  // draw leader as bezier from satellite to text-row
+  leaders += `<svg style="position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none;z-index:2" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none">
+    <path d="M${e.x.toFixed(1)},${e.y.toFixed(1)} L${(calloutX-8).toFixed(1)},${ly.toFixed(1)}" stroke="var(--rdr-ink)" stroke-width="0.7" fill="none" stroke-dasharray="2 3"/>
+  </svg>`;
+  html += `<div style="position:absolute;left:${calloutX}px;top:${ly}px;transform:translateY(-50%);font-family:var(--rdr-font-display);font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:0.06em;color:var(--rdr-ink);white-space:nowrap;pointer-events:none">
+    <span style="display:inline-block;width:6px;height:6px;border-radius:99px;background:var(--rdr-${e.color==='ink'?'ink':e.color==='morado'?'morado':e.color==='azul'?'azul-noche':e.color==='teal'?'cyan-mark':e.color==='verde'?'verde':'mostaza'});border:1px solid var(--rdr-ink);vertical-align:middle;margin-right:7px"></span>${e.name}
+  </div>`;
+});
+html = leaders + html;
+
+// header label for the callout stack
+html += `<div style="position:absolute;left:${calloutX}px;top:${calloutTop-22}px;font-family:var(--rdr-font-mono);font-size:9.5px;text-transform:uppercase;letter-spacing:0.18em;color:#e6195b;white-space:nowrap;pointer-events:none">Entidades adscritas · Bogotá</div>`;
+
+// scattered "dust" — territorial micro-presence, no semantic data
+let s2=11; function r2(){ s2=(s2*9301+49297)%233280; return s2/233280; }
+for(let i=0;i<40;i++){
+  // sample a random org and jitter near it (so dust hugs Colombia, not the void)
+  const o = orgs[Math.floor(r2()*orgs.length)];
+  const x = o.x + (r2()-.5)*120;
+  const y = o.y + (r2()-.5)*100;
+  if (x<60||x>W-40||y<60||y>H-60) continue;
+  html += `<div class="node dust" style="left:${x.toFixed(1)}px;top:${y.toFixed(1)}px"></div>`;
+}
+
+layer.innerHTML = html;
+</script>
+</body></html>

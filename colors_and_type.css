@@ -1,0 +1,327 @@
+/* ============================================================
+   RED DE REDES — Design tokens
+   Ministerio de las Culturas, las Artes y los Saberes · Colombia
+   ============================================================
+   Visual register: ink-on-paper network diagrams, organic
+   membranes, graph atlases. Black line over white space, with
+   the warm Casa Común palette held back as accent only.
+   ============================================================
+   Type pairing rationale (refs: cell-membrane ink drawing +
+   force-directed graph): we need a display face whose curves
+   feel hand-drawn and high-contrast — like ink that swells and
+   thins as it traces an organic boundary — paired with a body
+   face that has the neutral, diagrammatic precision of node
+   labels in a scientific atlas.
+
+     Display  · Instrument Serif  (high contrast, sharp ductus,
+                                   organic curves, near-italic
+                                   energy at every weight)
+     Body/UI  · IBM Plex Sans     (technical neutrality, clear
+                                   at small sizes, slight humanist
+                                   warmth so it doesn't feel
+                                   sterile next to the serif)
+     Mono     · IBM Plex Mono     (for node IDs, coordinates,
+                                   data labels in the map)
+
+   Both Plex faces are open-source and broadly available; IBM
+   Plex is also a strong fit for institutional / technical
+   documentation, which matches the "atlas of the network"
+   register the user is steering toward.
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@300;400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital,wght@0,400;1,400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;1,400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap');
+
+:root {
+  /* ---------- Palette ----------
+     Mostly black ink over off-white paper, à la diagram /
+     atlas. Warm earth tones from Casa Común remain available
+     but are now ACCENTS, not surfaces. */
+
+  /* Surface scale — cool stone + pale flesh, NOT warm cream */
+  --rdr-stone:        #e8e4dd;   /* primary page bg — neutral warm grey */
+  --rdr-stone-2:      #ddd7cc;   /* shadow stone */
+  --rdr-stone-3:      #cbc4b8;   /* deeper stone, dividers */
+  --rdr-flesh:        #ead9cc;   /* pale flesh — accent surface */
+  --rdr-flesh-2:      #d9c2b0;   /* deeper flesh */
+  --rdr-paper-pure:   #f4f0e8;   /* lightest card surface (still off-white-grey) */
+  --rdr-ink:          #1a1715;   /* deep cool-warm near-black */
+  --rdr-ink-soft:     #2e2a26;
+  --rdr-ink-mute:     #6b6258;
+  --rdr-ink-faint:    #a39a8d;
+
+  /* Legacy paper aliases (kept so existing components still work) */
+  --rdr-paper:        var(--rdr-stone);
+  --rdr-paper-2:      var(--rdr-stone-2);
+
+  /* Hairlines / connection lines */
+  --rdr-line:         rgba(14,13,11,0.14);
+  --rdr-line-soft:    rgba(14,13,11,0.08);
+  --rdr-line-strong:  rgba(14,13,11,0.32);
+  --rdr-line-ink:     rgba(14,13,11,0.85); /* graph edges */
+
+  /* Accent palette — DEEPER, more saturation, with institutional purple */
+  --rdr-morado:       #4a2a7a;   /* MORADO INSTITUCIONAL — Ministerio (signature) */
+  --rdr-morado-deep:  #2f1853;   /* deepest aubergine */
+  --rdr-morado-soft:  #7a5cb0;   /* lifted violet */
+  --rdr-coral:        #d44a35;   /* deeper red-coral, more pigment */
+  --rdr-coral-deep:   #a23018;
+  --rdr-terracotta:   #8a2e1a;
+  --rdr-ochre:        #b87a2a;
+  --rdr-mostaza:      #c89425;
+  --rdr-verde:        #2f5a32;   /* deep botanical green */
+  --rdr-verde-soft:   #688a4a;
+  --rdr-azul-noche:   #1c2540;   /* deeper indigo-night */
+  --rdr-azul-cielo:   #4a7396;
+  --rdr-cyan-mark:    #2a8a86;   /* deeper teal */
+  --rdr-magenta:      #8a2856;   /* magenta-vino, sister to morado */
+
+  /* Surfaces (semantic) */
+  --rdr-bg:           var(--rdr-stone);
+  --rdr-bg-flesh:     var(--rdr-flesh);
+  --rdr-bg-pure:      var(--rdr-paper-pure);
+  --rdr-bg-deep:      var(--rdr-ink);
+  --rdr-fg:           var(--rdr-ink);
+  --rdr-fg-muted:     var(--rdr-ink-mute);
+  --rdr-fg-faint:     var(--rdr-ink-faint);
+  --rdr-fg-on-dark:   var(--rdr-paper);
+
+  /* ---------- Type ---------- */
+  /* Display: Big Shoulders Display — condensed, slim, characterful;
+     Impact-flavored but with sharper humanist terminals + variable weight.
+     Editorial: Instrument Serif (italic only, used as accent voice).
+     Body/UI: IBM Plex Sans (technical neutrality). */
+  --rdr-font-display:   "Big Shoulders Display", "Oswald", Impact, sans-serif;
+  --rdr-font-editorial: "Instrument Serif", Georgia, serif;
+  --rdr-font-body:      "IBM Plex Sans", system-ui, -apple-system, sans-serif;
+  --rdr-font-mono:    "IBM Plex Mono", ui-monospace, "SFMono-Regular", monospace;
+  --rdr-font-icon:    "Material Symbols Outlined";
+
+  /* Tracking */
+  --rdr-tracking-display: -0.012em;   /* Instrument Serif sets tight */
+  --rdr-tracking-body:     0;
+  --rdr-tracking-eyebrow:  0.16em;    /* uppercase mono labels */
+  --rdr-tracking-mono:     0.04em;
+
+  /* ---------- Radius ----------
+     Network diagrams are mostly orthogonal + circular.
+     Radii are crisp, never pillowy. */
+  --rdr-r-xs:  2px;
+  --rdr-r-sm:  4px;
+  --rdr-r-md:  8px;
+  --rdr-r-lg:  14px;
+  --rdr-r-xl:  22px;
+  --rdr-r-pill:9999px;
+
+  /* ---------- Spacing ---------- */
+  --rdr-s-1:  4px;  --rdr-s-2:  8px;  --rdr-s-3:  12px;
+  --rdr-s-4:  16px; --rdr-s-5:  24px; --rdr-s-6:  32px;
+  --rdr-s-7:  48px; --rdr-s-8:  64px; --rdr-s-9:  96px;
+
+  /* ---------- Shadows ----------
+     Quiet. Ink-on-paper does not levitate. */
+  --rdr-shadow-sm: 0 1px 0 rgba(14,13,11,0.06);
+  --rdr-shadow-md: 0 1px 0 rgba(14,13,11,0.06), 0 12px 28px rgba(14,13,11,0.06);
+  --rdr-shadow-lg: 0 1px 0 rgba(14,13,11,0.08), 0 24px 60px rgba(14,13,11,0.10);
+  --rdr-shadow-ink: 0 0 0 1px rgba(14,13,11,0.85); /* "ink stroke" treatment */
+
+  /* Motion */
+  --rdr-ease: cubic-bezier(.2,.7,.2,1);
+  --rdr-dur-fast: 0.16s;
+  --rdr-dur-base: 0.30s;
+  --rdr-dur-slow: 0.6s;
+}
+
+/* ============================================================
+   Semantic styles
+   ============================================================ */
+html, body {
+  font-family: var(--rdr-font-body);
+  color: var(--rdr-fg);
+  background: var(--rdr-bg);
+  font-feature-settings: "ss01", "cv02", "cv11"; /* Plex stylistic */
+}
+
+/* ----- Display: Big Shoulders Display, slim + condensed ----- */
+.rdr-display, .rdr-h1, .rdr-h2, .rdr-h3,
+h1, h2, h3, h4 {
+  font-family: var(--rdr-font-display);
+  font-weight: 600;
+  letter-spacing: 0.005em;
+  line-height: 0.92;
+  color: var(--rdr-fg);
+  text-transform: uppercase;
+}
+
+.rdr-display {
+  font-size: clamp(3.5rem, 9vw, 8rem);
+  font-weight: 700;
+  line-height: 0.88;
+  text-wrap: balance;
+}
+.rdr-h1 { font-size: clamp(2.5rem, 5vw, 4.5rem); font-weight: 700; line-height: 0.92; }
+.rdr-h2 { font-size: clamp(1.75rem, 3.2vw, 2.75rem); font-weight: 600; line-height: 0.95; }
+.rdr-h3 { font-size: clamp(1.2rem, 1.8vw, 1.5rem); font-weight: 600; line-height: 1.05; }
+
+/* Editorial italic accent (Instrument Serif) — for *ese énfasis lírico* */
+.rdr-italic, .rdr-editorial {
+  font-family: var(--rdr-font-editorial);
+  font-style: italic;
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: -0.005em;
+}
+
+/* ----- Eyebrow / mono label ----- */
+.rdr-eyebrow {
+  font-family: var(--rdr-font-mono);
+  font-size: 0.7rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: var(--rdr-tracking-eyebrow);
+  color: var(--rdr-fg-muted);
+}
+.rdr-eyebrow-ink { color: var(--rdr-ink); }
+.rdr-eyebrow-coral { color: var(--rdr-coral-deep); }
+
+/* ----- Body ----- */
+.rdr-body {
+  font-family: var(--rdr-font-body);
+  font-size: 1rem;
+  line-height: 1.55;
+  font-weight: 400;
+}
+.rdr-body-lg {
+  font-size: clamp(1.05rem, 1.4vw, 1.18rem);
+  line-height: 1.55;
+  font-weight: 400;
+}
+.rdr-body-sm {
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: var(--rdr-fg-muted);
+}
+
+/* ----- Pull quote — Instrument italic, the lyric voice ----- */
+.rdr-quote {
+  font-family: var(--rdr-font-editorial);
+  font-style: italic;
+  font-weight: 400;
+  font-size: clamp(1.5rem, 2.6vw, 2.1rem);
+  line-height: 1.25;
+  color: var(--rdr-morado);
+  letter-spacing: -0.005em;
+  text-wrap: pretty;
+}
+
+/* ----- Data / coordinates ----- */
+.rdr-mono {
+  font-family: var(--rdr-font-mono);
+  font-size: 0.78rem;
+  letter-spacing: var(--rdr-tracking-mono);
+  color: var(--rdr-fg-muted);
+}
+.rdr-mono-ink { color: var(--rdr-ink); }
+
+.rdr-caption {
+  font-size: 0.85rem;
+  color: var(--rdr-fg-muted);
+  line-height: 1.45;
+}
+
+/* ============================================================
+   Accessibility nav contract
+   (small mono buttons, ink hairlines)
+   ============================================================ */
+.rdr-a11y-nav {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  font-family: var(--rdr-font-mono);
+  font-size: 0.7rem;
+  color: var(--rdr-fg-muted);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: var(--rdr-tracking-eyebrow);
+}
+.rdr-a11y-nav button {
+  width: 26px; height: 26px;
+  border-radius: 999px;
+  background: transparent;
+  border: 1px solid var(--rdr-line-strong);
+  color: var(--rdr-ink);
+  font-family: var(--rdr-font-body);
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex; align-items: center; justify-content: center;
+  transition: all var(--rdr-dur-fast) var(--rdr-ease);
+}
+.rdr-a11y-nav button:hover {
+  background: var(--rdr-ink); color: var(--rdr-paper);
+  border-color: var(--rdr-ink);
+}
+
+/* ============================================================
+   Legacy --cc-* aliases
+   (kept so older preview files keep rendering — points at
+   the new ink-first tokens; warm names map to accent palette)
+   ============================================================ */
+:root {
+  --cc-cream:        var(--rdr-stone);
+  --cc-cream-2:      var(--rdr-stone-2);
+  --cc-sand:         var(--rdr-flesh-2);
+  --cc-coral:        var(--rdr-coral);
+  --cc-coral-deep:   var(--rdr-coral-deep);
+  --cc-terracotta:   var(--rdr-terracotta);
+  --cc-ochre:        var(--rdr-ochre);
+  --cc-mostaza:      var(--rdr-mostaza);
+  --cc-verde-musgo:  var(--rdr-verde);
+  --cc-verde-oliva:  var(--rdr-verde-soft);
+  --cc-azul-noche:   var(--rdr-azul-noche);
+  --cc-azul-cielo:   var(--rdr-azul-cielo);
+  --cc-tinta:        var(--rdr-ink);
+  --cc-tinta-soft:   var(--rdr-ink-soft);
+
+  --cc-bg:           var(--rdr-bg);
+  --cc-bg-soft:      #faf6ea;
+  --cc-bg-deep:      var(--rdr-ink);
+  --cc-surface:      var(--rdr-paper-pure);
+  --cc-surface-2:    var(--rdr-paper-2);
+  --cc-line:         var(--rdr-line);
+  --cc-line-strong:  var(--rdr-line-strong);
+
+  --cc-fg:           var(--rdr-fg);
+  --cc-fg-muted:     var(--rdr-fg-muted);
+  --cc-fg-faint:     var(--rdr-fg-faint);
+  --cc-fg-on-dark:   var(--rdr-fg-on-dark);
+
+  --cc-font-body:    var(--rdr-font-body);
+  --cc-font-display: var(--rdr-font-display);
+  --cc-font-icon:    var(--rdr-font-icon);
+
+  --cc-tracking-display:   var(--rdr-tracking-display);
+  --cc-tracking-eyebrow:   var(--rdr-tracking-eyebrow);
+  --cc-tracking-uppercase: 0.10em;
+
+  --cc-r-xs: var(--rdr-r-xs);
+  --cc-r-sm: var(--rdr-r-sm);
+  --cc-r-md: var(--rdr-r-md);
+  --cc-r-lg: var(--rdr-r-lg);
+  --cc-r-xl: var(--rdr-r-xl);
+  --cc-r-pill: var(--rdr-r-pill);
+
+  --cc-s-1: 4px;  --cc-s-2: 8px;  --cc-s-3: 12px;
+  --cc-s-4: 16px; --cc-s-5: 24px; --cc-s-6: 32px;
+  --cc-s-7: 48px; --cc-s-8: 64px; --cc-s-9: 96px;
+
+  --cc-shadow-sm:    var(--rdr-shadow-sm);
+  --cc-shadow-md:    var(--rdr-shadow-md);
+  --cc-shadow-lg:    var(--rdr-shadow-lg);
+  --cc-shadow-paper: var(--rdr-shadow-md);
+
+  --cc-ease: var(--rdr-ease);
+  --cc-dur-fast: var(--rdr-dur-fast);
+  --cc-dur-base: var(--rdr-dur-base);
+  --cc-dur-slow: var(--rdr-dur-slow);
+}

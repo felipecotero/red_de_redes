@@ -1,0 +1,436 @@
+<!doctype html>
+<html lang="es-CO">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  html,body{
+    font-family:var(--rdr-font-body);
+    background:
+      radial-gradient(800px 500px at 0% 0%, #ece6da 0%, transparent 60%),
+      radial-gradient(700px 500px at 100% 100%, #d6cfc1 0%, transparent 65%),
+      #dad3c4;
+    color:var(--rdr-ink);
+    min-height:100vh;
+  }
+  body{padding:36px 32px 56px; position:relative; overflow:hidden}
+
+  /* disruptor stripe — diagonal magenta slash, top-right */
+  body::before{
+    content:""; position:absolute; top:-30px; right:-80px;
+    width:340px; height:22px; background:#e6195b;
+    transform:rotate(-18deg);
+    border-top:1.5px solid var(--rdr-ink);
+    border-bottom:1.5px solid var(--rdr-ink);
+    box-shadow:0 6px 18px rgba(230,25,91,0.30);
+  }
+
+  .head{display:flex; align-items:flex-end; justify-content:space-between; margin-bottom:28px; gap:24px}
+  .head .eye{
+    font-family:var(--rdr-font-mono); font-size:10.5px;
+    text-transform:uppercase; letter-spacing:var(--rdr-tracking-eyebrow);
+    color:#e6195b;
+    display:inline-flex; align-items:center; gap:8px; margin-bottom:8px;
+  }
+  .head .eye::before{
+    content:""; width:8px; height:8px; border-radius:99px; background:#e6195b;
+    box-shadow:0 0 0 3px rgba(230,25,91,0.25);
+  }
+  .head h1{
+    font-family:var(--rdr-font-display);
+    font-weight:700; text-transform:uppercase;
+    font-size:54px; line-height:0.88;
+    color:var(--rdr-ink); letter-spacing:0.005em;
+  }
+  .head h1 em{
+    font-family:var(--rdr-font-editorial); font-style:italic;
+    font-weight:400; text-transform:none;
+    letter-spacing:-0.012em; color:var(--rdr-morado);
+  }
+  .head .meta{
+    font-family:var(--rdr-font-mono); font-size:10.5px;
+    text-transform:uppercase; letter-spacing:var(--rdr-tracking-eyebrow);
+    color:var(--rdr-ink-mute); text-align:right;
+  }
+  .head .meta b{color:var(--rdr-ink); font-weight:600}
+
+  /* group */
+  .group{
+    border:1.5px solid var(--rdr-ink); border-radius:var(--rdr-r-lg);
+    background:rgba(244,240,232,0.55);
+    padding:22px 22px 24px; margin-bottom:22px;
+    position:relative;
+  }
+  .group .tag{
+    position:absolute; top:-12px; left:18px;
+    background:var(--rdr-ink); color:#fff;
+    font-family:var(--rdr-font-mono); font-size:10px;
+    text-transform:uppercase; letter-spacing:0.18em;
+    padding:4px 12px; border-radius:99px;
+  }
+  .group.coral .tag{background:#e6195b}
+  .group .gh{
+    display:flex; align-items:baseline; justify-content:space-between;
+    margin-bottom:18px; padding-bottom:14px;
+    border-bottom:1px dashed var(--rdr-line-strong);
+  }
+  .group .gh h2{
+    font-family:var(--rdr-font-display);
+    font-weight:700; text-transform:uppercase;
+    font-size:30px; line-height:0.92; color:var(--rdr-ink);
+    letter-spacing:0.005em;
+  }
+  .group .gh h2 em{
+    font-family:var(--rdr-font-editorial); font-style:italic;
+    font-weight:400; text-transform:none; color:var(--rdr-morado);
+    letter-spacing:-0.012em;
+  }
+  .group .gh .note{
+    font-family:var(--rdr-font-editorial); font-style:italic;
+    font-size:14px; color:var(--rdr-ink-soft);
+  }
+  .row{display:flex; flex-wrap:wrap; gap:12px; align-items:center}
+
+  /* ====== BUTTONS ====== */
+
+  /* Primary — magenta slab with ink border, condensed display type */
+  .btn-primary{
+    height:50px; padding:0 26px;
+    background:#e6195b; color:#fff;
+    border:1.5px solid var(--rdr-ink);
+    border-radius:99px;
+    font-family:var(--rdr-font-display);
+    font-weight:700; text-transform:uppercase;
+    font-size:15px; letter-spacing:0.06em;
+    cursor:pointer;
+    display:inline-flex; align-items:center; gap:10px;
+    box-shadow: 4px 4px 0 0 var(--rdr-ink);
+    transition: transform .14s var(--rdr-ease), box-shadow .14s var(--rdr-ease), background .14s var(--rdr-ease);
+  }
+  .btn-primary:hover{ transform:translate(2px,2px); box-shadow:2px 2px 0 0 var(--rdr-ink); background:#c81250 }
+  .btn-primary:active{ transform:translate(4px,4px); box-shadow:0 0 0 0 var(--rdr-ink) }
+  .btn-primary .pulse{
+    width:8px; height:8px; border-radius:99px; background:#fff;
+    box-shadow:0 0 0 3px rgba(255,255,255,0.30);
+    animation:p 1.6s ease-in-out infinite;
+  }
+  @keyframes p{ 0%,100%{transform:scale(1); box-shadow:0 0 0 3px rgba(255,255,255,0.30)} 50%{transform:scale(1.25); box-shadow:0 0 0 6px rgba(255,255,255,0.10)} }
+  .btn-primary .arrow{
+    font-family:var(--rdr-font-icon); font-size:18px;
+    transition:transform .2s var(--rdr-ease);
+  }
+  .btn-primary:hover .arrow{ transform:translateX(4px) }
+
+  /* Ink — black slab, magenta hairline accent */
+  .btn-ink{
+    height:50px; padding:0 26px;
+    background:var(--rdr-ink); color:#fff;
+    border:1.5px solid var(--rdr-ink);
+    border-radius:99px;
+    font-family:var(--rdr-font-display); font-weight:700;
+    text-transform:uppercase; font-size:15px; letter-spacing:0.06em;
+    cursor:pointer;
+    display:inline-flex; align-items:center; gap:10px;
+    position:relative;
+    transition: background .14s var(--rdr-ease);
+  }
+  .btn-ink::before{
+    content:""; position:absolute; left:14px; top:50%; transform:translateY(-50%);
+    width:6px; height:60%; background:#e6195b;
+  }
+  .btn-ink{ padding-left:32px; }
+  .btn-ink:hover{ background:#e6195b }
+  .btn-ink:hover::before{ background:#fff }
+
+  /* Ghost — ink outline that flips */
+  .btn-ghost{
+    height:50px; padding:0 26px;
+    background:transparent; color:var(--rdr-ink);
+    border:1.5px solid var(--rdr-ink);
+    border-radius:99px;
+    font-family:var(--rdr-font-display); font-weight:700;
+    text-transform:uppercase; font-size:15px; letter-spacing:0.06em;
+    cursor:pointer;
+    display:inline-flex; align-items:center; gap:10px;
+    transition: all .18s var(--rdr-ease);
+  }
+  .btn-ghost:hover{ background:var(--rdr-ink); color:#fff }
+
+  /* Editorial — italic serif voice, no fill */
+  .btn-editorial{
+    height:50px; padding:0 22px 0 0;
+    background:transparent; color:var(--rdr-morado);
+    border:none; cursor:pointer;
+    font-family:var(--rdr-font-editorial);
+    font-style:italic; font-weight:400;
+    font-size:24px; letter-spacing:-0.01em;
+    display:inline-flex; align-items:center; gap:10px;
+    border-bottom:1.5px solid var(--rdr-morado);
+    border-radius:0; padding-bottom:4px;
+    transition: color .14s var(--rdr-ease), border-color .14s var(--rdr-ease);
+  }
+  .btn-editorial:hover{ color:#e6195b; border-color:#e6195b }
+  .btn-editorial .arr{
+    font-family:var(--rdr-font-display); font-style:normal;
+    font-size:14px; font-weight:700; text-transform:uppercase;
+    letter-spacing:0.10em;
+    transition:transform .2s var(--rdr-ease);
+  }
+  .btn-editorial:hover .arr{ transform:translateX(4px) }
+
+  /* Morado — institutional violet */
+  .btn-morado{
+    height:50px; padding:0 26px;
+    background:var(--rdr-morado); color:#fff;
+    border:1.5px solid var(--rdr-ink);
+    border-radius:99px;
+    font-family:var(--rdr-font-display); font-weight:700;
+    text-transform:uppercase; font-size:15px; letter-spacing:0.06em;
+    cursor:pointer;
+    display:inline-flex; align-items:center; gap:10px;
+    transition: background .14s var(--rdr-ease);
+  }
+  .btn-morado:hover{ background:#2f1853 }
+
+  /* === SECONDARY (compact) === */
+  .btn-tag{
+    height:34px; padding:0 14px;
+    background:transparent; color:var(--rdr-ink-soft);
+    border:1px solid var(--rdr-line-strong);
+    border-radius:99px;
+    font-family:var(--rdr-font-body); font-weight:500; font-size:12.5px;
+    cursor:pointer;
+    display:inline-flex; align-items:center; gap:6px;
+    transition:all .14s var(--rdr-ease);
+  }
+  .btn-tag:hover{ border-color:var(--rdr-ink); color:var(--rdr-ink) }
+  .btn-tag.on{ background:#e6195b; border-color:#e6195b; color:#fff }
+  .btn-tag .x{
+    font-family:var(--rdr-font-icon); font-size:14px;
+  }
+
+  .btn-link{
+    background:transparent; border:none; cursor:pointer;
+    font-family:var(--rdr-font-mono); font-size:11.5px;
+    color:var(--rdr-ink); text-transform:uppercase;
+    letter-spacing:0.16em; padding:6px 0;
+    border-bottom:1.5px solid #e6195b;
+    display:inline-flex; align-items:center; gap:6px;
+  }
+  .btn-link:hover{ color:#e6195b }
+  .btn-link::after{ content:"→"; transition:transform .2s var(--rdr-ease) }
+  .btn-link:hover::after{ transform:translateX(3px) }
+
+  /* Icon — round ink */
+  .btn-icon{
+    width:46px; height:46px; border-radius:99px;
+    background:transparent; color:var(--rdr-ink);
+    border:1.5px solid var(--rdr-ink); cursor:pointer;
+    display:inline-flex; align-items:center; justify-content:center;
+    font-family:var(--rdr-font-icon); font-size:20px;
+    transition: all .14s var(--rdr-ease);
+  }
+  .btn-icon:hover{ background:#e6195b; border-color:#e6195b; color:#fff }
+  .btn-icon.filled{ background:var(--rdr-ink); color:#fff }
+  .btn-icon.filled:hover{ background:#e6195b; border-color:#e6195b }
+
+  /* === XL display button === */
+  .btn-xl{
+    height:88px; padding:0 36px 0 32px;
+    background:#fff; color:var(--rdr-ink);
+    border:1.5px solid var(--rdr-ink);
+    border-radius:14px;
+    font-family:var(--rdr-font-display); font-weight:700;
+    text-transform:uppercase; font-size:38px; line-height:0.9;
+    letter-spacing:0.005em;
+    cursor:pointer;
+    display:inline-flex; align-items:center; gap:18px;
+    box-shadow: 6px 6px 0 0 #e6195b, 6px 6px 0 1.5px var(--rdr-ink);
+    transition: transform .14s var(--rdr-ease), box-shadow .14s var(--rdr-ease);
+    text-align:left;
+  }
+  .btn-xl:hover{ transform:translate(3px,3px); box-shadow:3px 3px 0 0 #e6195b, 3px 3px 0 1.5px var(--rdr-ink) }
+  .btn-xl em{
+    font-family:var(--rdr-font-editorial); font-style:italic;
+    font-weight:400; text-transform:none; color:#e6195b;
+    letter-spacing:-0.012em;
+  }
+  .btn-xl .num{
+    font-family:var(--rdr-font-mono); font-size:11px;
+    text-transform:uppercase; letter-spacing:0.18em;
+    color:var(--rdr-ink-mute); align-self:flex-end;
+    padding-bottom:4px;
+  }
+  .btn-xl .stack{ display:flex; flex-direction:column; gap:4px }
+  .btn-xl .stack small{
+    font-family:var(--rdr-font-mono); font-size:10.5px;
+    font-weight:400; text-transform:uppercase; letter-spacing:0.16em;
+    color:var(--rdr-ink-mute); line-height:1;
+  }
+  .btn-xl .arrow{
+    font-family:var(--rdr-font-icon); font-size:32px; color:#e6195b;
+    margin-left:auto;
+    transition:transform .2s var(--rdr-ease);
+  }
+  .btn-xl:hover .arrow{ transform:translateX(6px) }
+
+  /* state row */
+  .states{
+    display:grid; grid-template-columns:repeat(4,1fr);
+    gap:10px;
+    border:1px dashed var(--rdr-line-strong);
+    border-radius:var(--rdr-r-md);
+    padding:14px; background:rgba(244,240,232,0.5);
+  }
+  .states .cell{
+    display:flex; flex-direction:column; align-items:flex-start; gap:8px;
+  }
+  .states .k{
+    font-family:var(--rdr-font-mono); font-size:9.5px;
+    text-transform:uppercase; letter-spacing:0.18em;
+    color:var(--rdr-ink-mute);
+  }
+  .demo-disabled{ opacity:0.4; pointer-events:none; filter:grayscale(0.4) }
+
+  .footer{
+    margin-top:18px;
+    font-family:var(--rdr-font-mono); font-size:10.5px;
+    color:var(--rdr-ink-mute); text-transform:uppercase;
+    letter-spacing:var(--rdr-tracking-eyebrow);
+    display:flex; align-items:center; gap:14px;
+  }
+  .footer b{ color:var(--rdr-ink); font-weight:600 }
+  .footer .swatch{ width:10px; height:10px; border-radius:99px; display:inline-block; vertical-align:-1px; margin-right:4px; border:1px solid var(--rdr-ink) }
+</style>
+</head>
+<body>
+
+  <div class="head">
+    <div>
+      <div class="eye">componentes · botones</div>
+      <h1>Botones que <em>insisten</em>.</h1>
+    </div>
+    <div class="meta">
+      <div><b>v0.3</b> — Red de redes</div>
+      <div>magenta · ink · morado</div>
+    </div>
+  </div>
+
+  <!-- PRIMARY GROUP -->
+  <div class="group coral">
+    <span class="tag">Acciones primarias</span>
+    <div class="gh">
+      <h2>Acción <em>directa</em></h2>
+      <span class="note">slabs con sombra ink — tipografía condensada, gritan sin gritar.</span>
+    </div>
+    <div class="row">
+      <button class="btn-primary"><span class="pulse"></span>Explorar el tejido<span class="arrow material-symbols-outlined">arrow_forward</span></button>
+      <button class="btn-ink">Sumarse a la red</button>
+      <button class="btn-morado">Postular un nodo</button>
+      <button class="btn-ghost">Ver el manifiesto</button>
+    </div>
+  </div>
+
+  <!-- XL HERO BUTTON -->
+  <div class="group">
+    <span class="tag">Llamado XL</span>
+    <div class="gh">
+      <h2>Cuando <em>importa</em></h2>
+      <span class="note">slab editorial con sombra magenta — para CTAs de portada.</span>
+    </div>
+    <div class="row">
+      <button class="btn-xl">
+        <div class="stack"><small>Convocatoria 2024</small>Tejer un <em>nodo</em></div>
+        <span class="num">N° 014</span>
+        <span class="arrow material-symbols-outlined">arrow_outward</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- EDITORIAL + LINK -->
+  <div class="group">
+    <span class="tag">Voz editorial</span>
+    <div class="gh">
+      <h2>Lectura <em>continua</em></h2>
+      <span class="note">italic serif para enlaces narrativos — el botón como párrafo.</span>
+    </div>
+    <div class="row" style="gap:32px">
+      <button class="btn-editorial">Leer la conversación entera <span class="arr">→</span></button>
+      <button class="btn-link">Ver los 142 nodos</button>
+      <button class="btn-link">Descargar el atlas</button>
+    </div>
+  </div>
+
+  <!-- TAGS / FILTERS -->
+  <div class="group">
+    <span class="tag">Filtros · etiquetas</span>
+    <div class="gh">
+      <h2>Selección <em>temática</em></h2>
+      <span class="note">apagados → encendidos en magenta. La intensidad importa.</span>
+    </div>
+    <div class="row">
+      <button class="btn-tag on">Todas <span class="x material-symbols-outlined">close</span></button>
+      <button class="btn-tag">Memoria</button>
+      <button class="btn-tag">Territorios</button>
+      <button class="btn-tag">Lenguas</button>
+      <button class="btn-tag on">Pueblos <span class="x material-symbols-outlined">close</span></button>
+      <button class="btn-tag">Cine comunitario</button>
+      <button class="btn-tag">Saberes</button>
+    </div>
+  </div>
+
+  <!-- ICONS -->
+  <div class="group">
+    <span class="tag">Acciones · icono</span>
+    <div class="gh">
+      <h2>Pequeñas <em>palancas</em></h2>
+      <span class="note">redondas, todas con borde ink. Hover → magenta.</span>
+    </div>
+    <div class="row">
+      <button class="btn-icon material-symbols-outlined">search</button>
+      <button class="btn-icon material-symbols-outlined">my_location</button>
+      <button class="btn-icon material-symbols-outlined">tune</button>
+      <button class="btn-icon material-symbols-outlined">share</button>
+      <button class="btn-icon material-symbols-outlined">bookmark</button>
+      <button class="btn-icon filled material-symbols-outlined">play_arrow</button>
+      <button class="btn-icon filled material-symbols-outlined">add</button>
+    </div>
+  </div>
+
+  <!-- STATES -->
+  <div class="group">
+    <span class="tag">Estados</span>
+    <div class="gh">
+      <h2>Pulso <em>vivo</em></h2>
+      <span class="note">cómo se siente el botón en cada momento.</span>
+    </div>
+    <div class="states">
+      <div class="cell">
+        <span class="k">/ default</span>
+        <button class="btn-primary">Acción</button>
+      </div>
+      <div class="cell">
+        <span class="k">/ hover</span>
+        <button class="btn-primary" style="transform:translate(2px,2px); box-shadow:2px 2px 0 0 var(--rdr-ink); background:#c81250">Acción</button>
+      </div>
+      <div class="cell">
+        <span class="k">/ active</span>
+        <button class="btn-primary" style="transform:translate(4px,4px); box-shadow:0 0 0 0 var(--rdr-ink); background:#a80f43">Acción</button>
+      </div>
+      <div class="cell">
+        <span class="k">/ disabled</span>
+        <button class="btn-primary demo-disabled">Acción</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <span><span class="swatch" style="background:#e6195b"></span>magenta · #e6195b</span>
+    <span><span class="swatch" style="background:var(--rdr-ink)"></span>ink · #1a1715</span>
+    <span><span class="swatch" style="background:var(--rdr-morado)"></span>morado · #4a2a7a</span>
+    <span style="margin-left:auto">Big Shoulders · Instrument Serif · IBM Plex</span>
+  </div>
+
+</body>
+</html>
