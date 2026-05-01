@@ -229,6 +229,59 @@
     color:var(--rdr-ink-mute);text-transform:uppercase;letter-spacing:0.14em;
   }
 
+  /* ---- zoom wrapper (animates map + nodes together) ---- */
+  .map-wrap{
+    position:absolute;inset:0;
+    transform-origin:0 0;
+    transition:transform 0.55s cubic-bezier(0.4,0,0.2,1);
+    will-change:transform;
+  }
+
+  /* ---- zoom reset button ---- */
+  .zoom-reset{
+    position:absolute;bottom:68px;left:24px;z-index:25;
+    display:none;align-items:center;gap:6px;
+    height:30px;padding:0 12px;border-radius:99px;
+    background:rgba(244,240,232,0.92);border:1.5px solid var(--rdr-ink);
+    cursor:pointer;
+    font-family:var(--rdr-font-mono);font-size:9.5px;
+    text-transform:uppercase;letter-spacing:0.14em;color:var(--rdr-ink);
+    box-shadow:0 4px 14px rgba(26,23,21,0.14);
+    transition:all .15s var(--rdr-ease);
+    animation:fadeInUp .3s ease forwards;
+  }
+  .zoom-reset:hover{background:var(--rdr-ink);color:#fff}
+  @keyframes fadeInUp{
+    from{opacity:0;transform:translateY(6px)}
+    to{opacity:1;transform:translateY(0)}
+  }
+
+  /* ---- scroll hint (mobile only) ---- */
+  .scroll-hint{
+    position:absolute;bottom:16px;left:50%;transform:translateX(-50%);
+    z-index:25;display:none;align-items:center;gap:8px;
+    background:#e6195b;color:#fff;border-radius:99px;
+    padding:11px 20px;
+    font-family:var(--rdr-font-mono);font-size:10.5px;
+    text-transform:uppercase;letter-spacing:0.14em;white-space:nowrap;
+    box-shadow:0 6px 24px rgba(230,25,91,0.40);
+    pointer-events:none;
+  }
+  .scroll-hint.visible{
+    display:flex;
+    animation:shFloat .45s ease forwards, shFade .35s ease 2.4s forwards;
+  }
+  @keyframes shFloat{
+    from{opacity:0;transform:translateX(-50%) translateY(10px)}
+    to{opacity:1;transform:translateX(-50%) translateY(0)}
+  }
+  @keyframes shFade{to{opacity:0}}
+  .scroll-hint-arrow{
+    display:inline-block;
+    animation:bounce 1s ease-in-out infinite;
+  }
+  @keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(3px)}}
+
   /* FICHA panel */
   .ficha{
     background:#f4f0e8;border:1.5px solid var(--rdr-ink);border-radius:14px;
@@ -471,18 +524,27 @@
       <div>Cargando geografía · Colombia</div>
     </div>
 
-    <svg class="map-svg" id="mapSvg" viewBox="0 0 880 880" preserveAspectRatio="xMidYMid meet">
-      <defs>
-        <filter id="ink"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" seed="9"/><feDisplacementMap in="SourceGraphic" scale="0.6"/></filter>
-      </defs>
-      <g id="depts" fill="rgba(234,217,204,0.4)" stroke="rgba(26,23,21,0.35)" stroke-width="0.7" stroke-linejoin="round"></g>
-      <path id="outline" fill="none" stroke="var(--rdr-ink)" stroke-width="1.6" stroke-linejoin="round"></path>
+    <!-- map-wrap: single element we transform for zoom (SVG + nodes move together) -->
+    <div class="map-wrap" id="mapWrap">
+      <svg class="map-svg" id="mapSvg" viewBox="0 0 880 880" preserveAspectRatio="xMidYMid meet">
+        <defs>
+          <filter id="ink"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" seed="9"/><feDisplacementMap in="SourceGraphic" scale="0.6"/></filter>
+        </defs>
+        <g id="depts" fill="rgba(234,217,204,0.4)" stroke="rgba(26,23,21,0.35)" stroke-width="0.7" stroke-linejoin="round"></g>
+        <path id="outline" fill="none" stroke="var(--rdr-ink)" stroke-width="1.6" stroke-linejoin="round"></path>
+        <!-- mesh: subtle connections from each nodo to capital -->
+        <g id="axons" stroke="#4a2a7a" stroke-width="1.0" fill="none" stroke-opacity="0.55" stroke-dasharray="3 4"></g>
+      </svg>
+      <div class="nodes" id="nodesLayer"></div>
+    </div>
 
-      <!-- mesh: subtle connections from each nodo to capital -->
-      <g id="axons" stroke="#4a2a7a" stroke-width="1.0" fill="none" stroke-opacity="0.55" stroke-dasharray="3 4"></g>
-    </svg>
+    <!-- zoom reset: appears when map is zoomed in -->
+    <button class="zoom-reset" id="zoomReset" onclick="resetZoom()" aria-label="Ver mapa completo">↺ Vista completa</button>
 
-    <div class="nodes" id="nodesLayer"></div>
+    <!-- scroll hint: mobile only — appears after selecting a node -->
+    <div class="scroll-hint" id="scrollHint" aria-live="polite">
+      Ver ficha <span class="scroll-hint-arrow">↓</span>
+    </div>
 
     <div class="map-attrib">geo · DANE / John Guerra</div>
     <div class="scale"><span class="bar"></span></div>
@@ -704,6 +766,9 @@ async function loadMap(){
   });
 
   document.getElementById('loading').style.display='none';
+
+  // Zoom to the initially selected node once the map is ready
+  zoomToNode(nodos[current]);
 }
 
 /* =====================================================================
@@ -781,6 +846,57 @@ function renderFicha(){
   document.getElementById('nextBtn').onclick = ()=>{ const ni = (current+1)%nodos.length; select(nodos[ni].id); };
 }
 
+/* =====================================================================
+   ZOOM — centers the clicked node in the stage viewport
+===================================================================== */
+const ZOOM_S = 2.2; // zoom scale factor
+
+function zoomToNode(n){
+  if(!n || n._x == null) return; // map not loaded yet
+  const stage = document.querySelector('.stage');
+  const W = stage.clientWidth;
+  const H = stage.clientHeight;
+  // n._x / n._y are in 0-880 SVG space; normalize to 0-1
+  const nx = n._x / 880;
+  const ny = n._y / 880;
+  // With transform-origin 0 0 and transform: translate(tx,ty) scale(S):
+  // the point (nx*W, ny*H) maps to (nx*W*S + tx, ny*H*S + ty).
+  // We want that to equal (W/2, H/2) → center of stage.
+  const tx = W/2 - nx * W * ZOOM_S;
+  const ty = H/2 - ny * H * ZOOM_S;
+  const wrap = document.getElementById('mapWrap');
+  wrap.style.transformOrigin = '0 0';
+  wrap.style.transform = `translate(${tx.toFixed(1)}px,${ty.toFixed(1)}px) scale(${ZOOM_S})`;
+  // Show reset button
+  const btn = document.getElementById('zoomReset');
+  btn.style.display = 'flex';
+  // Force re-trigger animation
+  btn.style.animation = 'none';
+  btn.offsetHeight;
+  btn.style.animation = '';
+}
+
+function resetZoom(){
+  const wrap = document.getElementById('mapWrap');
+  wrap.style.transform = 'translate(0px,0px) scale(1)';
+  document.getElementById('zoomReset').style.display = 'none';
+}
+
+/* =====================================================================
+   SCROLL HINT — mobile: animated pill nudging user to scroll down
+===================================================================== */
+let _hintTimer;
+function showScrollHint(){
+  if(window.innerWidth >= 1080) return; // desktop doesn't need it
+  const hint = document.getElementById('scrollHint');
+  hint.classList.remove('visible');
+  clearTimeout(_hintTimer);
+  // Force reflow so the animation restarts cleanly
+  void hint.offsetWidth;
+  hint.classList.add('visible');
+  _hintTimer = setTimeout(()=>{ hint.classList.remove('visible'); }, 3000);
+}
+
 function select(id){
   current = nodos.findIndex(n=>n.id===id);
   document.querySelectorAll('.node.nodo').forEach(el=>{
@@ -789,7 +905,16 @@ function select(id){
   document.querySelectorAll('.node-label').forEach(el=>{
     el.classList.toggle('selected', el.dataset.labelId===id);
   });
+  // Zoom map to selected node
+  zoomToNode(nodos[current]);
   renderFicha();
+  // Mobile: show hint + auto-scroll to ficha after zoom starts
+  if(window.innerWidth < 1080){
+    showScrollHint();
+    setTimeout(()=>{
+      document.getElementById('ficha').scrollIntoView({behavior:'smooth', block:'start'});
+    }, 600);
+  }
 }
 
 renderFicha();
