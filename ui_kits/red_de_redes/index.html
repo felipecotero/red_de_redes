@@ -521,22 +521,26 @@ async function loadMap(){
     });
   });
 
-  /* simple equirectangular fit, latitude-corrected */
+  /* simple equirectangular fit, latitude-corrected
+     IMPORTANT: cosLat must be applied BOTH to lonRange (for the scale)
+     AND to (lon - minLon) inside projector (for each point's X).
+     Using cosLat only in one place causes systematic horizontal drift. */
   const midLat = (minLat+maxLat)/2;
   const cosLat = Math.cos(midLat * Math.PI/180);
-  const lonRange = (maxLon-minLon) * cosLat;
-  const latRange = (maxLat-minLat);
+  const lonRange = (maxLon - minLon) * cosLat;   // width in "corrected" degrees
+  const latRange = (maxLat - minLat);             // height in degrees
 
   const aw = W - 2*PAD;
   const ah = H - 2*PAD;
-  // scale to fit
+  // scale: fit the corrected bounding box inside the canvas
   const sx = aw / lonRange;
   const sy = ah / latRange;
-  const s = Math.min(sx, sy) * 0.96;
-  const ox = PAD + (aw - lonRange*s)/2;
-  const oy = PAD + (ah - latRange*s)/2;
+  const s  = Math.min(sx, sy) * 0.96;
+  const ox = PAD + (aw - lonRange * s) / 2;
+  const oy = PAD + (ah - latRange * s) / 2;
 
   projector = function(lon, lat){
+    // apply cosLat to lon offset — same factor used in lonRange → consistent
     const x = ox + (lon - minLon) * cosLat * s;
     const y = oy + (maxLat - lat) * s;
     return {x, y};
@@ -584,18 +588,21 @@ async function loadMap(){
   });
   document.getElementById('axons').innerHTML = axHTML;
 
-  /* place nodes */
+  /* place nodes — use PERCENTAGES (not px) so they scale 1:1 with the
+     SVG viewBox (0 0 880 880) regardless of the rendered element width */
+  const toP = (v, dim) => (v / dim * 100).toFixed(3) + '%';
   const layer = document.getElementById('nodesLayer');
   let html = '';
   // Capital reference (small ring, non-clickable)
-  html += `<div class="capital-ref" style="left:${cap.x}px;top:${cap.y}px"></div>`;
+  html += `<div class="capital-ref" style="left:${toP(cap.x,W)};top:${toP(cap.y,H)}"></div>`;
 
   nodos.forEach((n, i)=>{
     const p = projector(n.lon, n.lat);
     n._x = p.x; n._y = p.y;
-    const labelClass = n.id==='cucuta' ? '' : 'left'; // cucuta is far right, label goes right; others to the left
-    html += `<button class="node nodo ${i===0?'selected':''}" data-id="${n.id}" style="left:${p.x}px;top:${p.y}px" aria-label="${n.city} — ${n.red}"></button>`;
-    html += `<div class="node-label ${labelClass} ${i===0?'selected':''}" data-label-id="${n.id}" style="left:${p.x}px;top:${p.y}px">${n.city}<small>${n.red}</small></div>`;
+    // Cúcuta is on the right edge — label to the left; Quibdó is left — label to the right
+    const labelClass = n.id==='quibdo' ? '' : 'left';
+    html += `<button class="node nodo ${i===0?'selected':''}" data-id="${n.id}" style="left:${toP(p.x,W)};top:${toP(p.y,H)}" aria-label="${n.city} — ${n.red}"></button>`;
+    html += `<div class="node-label ${labelClass} ${i===0?'selected':''}" data-label-id="${n.id}" style="left:${toP(p.x,W)};top:${toP(p.y,H)}">${n.city}<small>${n.red}</small></div>`;
   });
   layer.innerHTML = html;
 
