@@ -1,0 +1,1661 @@
+<!doctype html>
+<html lang="es-CO">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Red de redes · Ingreso de nodos · Minculturas 2026</title>
+<link rel="stylesheet" href="../../colors_and_type.css">
+<style>
+  *,*::before,*::after{box-sizing:border-box}
+  html,body{margin:0;padding:0;min-height:100vh}
+  body{
+    background:
+      radial-gradient(1200px 700px at 8% -8%, #ece6da 0%, transparent 60%),
+      radial-gradient(900px 600px at 100% 100%, #d6cfc1 0%, transparent 65%),
+      #dad3c4;
+    color:var(--rdr-ink); font-family:var(--rdr-font-body);
+  }
+
+  /* a11y bar */
+  .a11y-strip{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:9px 36px; background:rgba(26,23,21,0.05);
+    border-bottom:1px solid var(--rdr-line);
+    font-family:var(--rdr-font-mono);font-size:11px;
+    color:var(--rdr-ink-mute);text-transform:uppercase;letter-spacing:0.16em;
+  }
+  .a11y-strip a.skip{color:var(--rdr-ink);font-weight:600;text-decoration:none}
+
+  /* header */
+  header.top{
+    display:flex;align-items:flex-end;justify-content:space-between;gap:32px;
+    padding:28px 36px 20px;border-bottom:1.5px solid var(--rdr-ink);
+  }
+  .brand .eye{
+    font-family:var(--rdr-font-mono);font-size:10.5px;
+    text-transform:uppercase;letter-spacing:0.16em;color:var(--rdr-ink-mute);
+    margin-bottom:4px;
+  }
+  .brand h1{
+    font-family:var(--rdr-font-display);font-weight:700;text-transform:uppercase;
+    font-size:38px;line-height:0.9;color:var(--rdr-ink);margin:0;letter-spacing:0.005em;
+  }
+  .brand h1 em{
+    font-family:var(--rdr-font-editorial);font-style:italic;font-weight:400;
+    text-transform:none;letter-spacing:-0.012em;color:#e6195b;
+  }
+  .brand .doc{
+    font-family:var(--rdr-font-mono);font-size:11px;color:var(--rdr-ink-soft);
+    text-transform:uppercase;letter-spacing:0.14em;margin-top:6px;
+  }
+  .brand .doc b{color:var(--rdr-ink);font-weight:600}
+  header .meta{
+    text-align:right;
+    font-family:var(--rdr-font-mono);font-size:10.5px;color:var(--rdr-ink-mute);
+    text-transform:uppercase;letter-spacing:0.16em;
+  }
+  header .meta b{color:var(--rdr-ink);font-weight:600}
+  header .meta .pulse{
+    display:inline-flex;align-items:center;gap:8px;color:#e6195b;margin-bottom:4px;
+  }
+  header .meta .pulse::before{
+    content:"";width:8px;height:8px;border-radius:99px;background:#e6195b;
+    box-shadow:0 0 0 3px rgba(230,25,91,0.25);
+    animation:p 1.6s ease-in-out infinite;
+  }
+  @keyframes p{0%,100%{transform:scale(1)}50%{transform:scale(1.25)}}
+
+  /* main grid */
+  main{
+    max-width:1480px;margin:0 auto;padding:28px 36px 80px;
+    display:grid;grid-template-columns:1.4fr 1fr;gap:24px;align-items:stretch;
+  }
+
+  /* MAP STAGE */
+  .stage{
+    position:relative;
+    /* aspect-ratio keeps the square Colombia map proportional on every screen */
+    aspect-ratio:1/1;
+    background:
+      radial-gradient(700px 500px at 40% 38%,#efe9da 0%,transparent 70%),
+      #d3ccbd;
+    border:1.5px solid var(--rdr-ink);border-radius:14px;overflow:hidden;
+    box-shadow:0 24px 60px rgba(26,23,21,.10);
+  }
+  .stage::before{
+    content:"";position:absolute;inset:0;
+    background-image:
+      radial-gradient(circle at 20% 30%, rgba(26,23,21,.022) 0, transparent 1.5px),
+      radial-gradient(circle at 70% 60%, rgba(26,23,21,.020) 0, transparent 1.5px);
+    background-size:8px 8px,12px 12px;
+    mix-blend-mode:multiply;opacity:.55;pointer-events:none;
+  }
+
+  .stage-head{
+    position:absolute;top:18px;left:24px;right:24px;z-index:20;
+    display:flex;align-items:flex-start;justify-content:space-between;gap:18px;
+    pointer-events:none;
+  }
+  .stage-head .lbl{
+    font-family:var(--rdr-font-mono);font-size:10px;
+    text-transform:uppercase;letter-spacing:0.18em;color:var(--rdr-ink-mute);
+  }
+  .stage-head h2{
+    font-family:var(--rdr-font-display);font-weight:700;text-transform:uppercase;
+    font-size:34px;margin:6px 0 0;letter-spacing:0.005em;line-height:0.92;
+    color:var(--rdr-ink);
+  }
+  .stage-head h2 em{
+    font-family:var(--rdr-font-editorial);font-style:italic;font-weight:400;
+    text-transform:none;letter-spacing:-0.012em;color:#e6195b;
+  }
+  .legend{
+    background:rgba(244,240,232,0.7);
+    border:1.5px solid var(--rdr-ink);border-radius:8px;
+    padding:10px 12px;display:flex;flex-direction:column;gap:5px;
+    font-family:var(--rdr-font-mono);font-size:10px;
+    color:var(--rdr-ink-soft);text-transform:uppercase;letter-spacing:0.16em;
+  }
+  .legend span{display:inline-flex;align-items:center;gap:8px}
+  .legend i{width:9px;height:9px;border-radius:99px;border:1px solid rgba(26,23,21,.6)}
+
+  .map-svg{position:absolute;inset:0;width:100%;height:100%;z-index:1}
+  .nodes{position:absolute;inset:0;z-index:3;pointer-events:none}
+  .nodes > *{pointer-events:auto}
+
+  /* Loading state */
+  .map-loading{
+    position:absolute;inset:0;z-index:10;
+    display:flex;align-items:center;justify-content:center;flex-direction:column;gap:12px;
+    font-family:var(--rdr-font-mono);font-size:11px;color:var(--rdr-ink-mute);
+    text-transform:uppercase;letter-spacing:0.18em;
+  }
+  .map-loading .spinner{
+    width:30px;height:30px;border-radius:99px;
+    border:2px solid rgba(26,23,21,0.15);border-top-color:#e6195b;
+    animation:spin 0.9s linear infinite;
+  }
+  @keyframes spin{to{transform:rotate(360deg)}}
+
+  /* nodes */
+  .node{
+    position:absolute;transform:translate(-50%,-50%);
+    border-radius:99px;cursor:pointer;
+    transition:transform .25s var(--rdr-ease);z-index:4;
+    border:none;padding:0;
+  }
+  .node:focus-visible{outline:3px solid #e6195b;outline-offset:4px}
+  .node:hover{transform:translate(-50%,-50%) scale(1.3);z-index:30}
+
+  .node.nodo{
+    width:18px;height:18px;background:var(--rdr-morado);
+    border:2px solid var(--rdr-ink);
+    box-shadow:0 0 0 4px rgba(74,42,122,0.18);
+  }
+  .node.nodo.selected{
+    background:#e6195b;
+    box-shadow:0 0 0 6px rgba(230,25,91,0.25);
+    z-index:6;
+  }
+  .node.nodo.selected::after{
+    content:"";position:absolute;inset:-3px;border-radius:99px;
+    border:1.5px dashed var(--rdr-ink);
+    animation:rot 14s linear infinite;
+  }
+  @keyframes rot{to{transform:rotate(360deg)}}
+  .node.nodo.selected::before{
+    content:"";position:absolute;inset:-2px;border-radius:99px;
+    box-shadow:0 0 0 0 rgba(230,25,91,.55);
+    animation:ring 2.2s ease-out infinite;
+  }
+  @keyframes ring{0%{box-shadow:0 0 0 0 rgba(230,25,91,.5)}100%{box-shadow:0 0 0 28px rgba(230,25,91,0)}}
+
+  .node-label{
+    position:absolute;
+    font-family:var(--rdr-font-display);font-weight:700;text-transform:uppercase;
+    font-size:13px;line-height:1;letter-spacing:0.04em;color:var(--rdr-ink);
+    text-align:left;white-space:nowrap;pointer-events:none;
+    transform:translate(14px,-8px);
+  }
+  .node-label small{
+    display:block;margin-top:4px;
+    font-family:var(--rdr-font-mono);font-size:9.5px;font-weight:500;
+    text-transform:uppercase;letter-spacing:0.14em;color:var(--rdr-ink-mute);
+    text-wrap:pretty;
+  }
+  .node-label.selected{color:#e6195b}
+  .node-label.left{transform:translate(calc(-100% - 14px),-8px);text-align:right}
+
+  /* Capital reference (Bogotá) - small, non-clickable, just orientation */
+  .capital-ref{
+    position:absolute;width:9px;height:9px;border-radius:99px;
+    background:transparent;border:1.5px solid var(--rdr-ink);
+    transform:translate(-50%,-50%);z-index:3;
+  }
+  .capital-ref::after{
+    content:"Bogotá";position:absolute;top:14px;left:50%;transform:translateX(-50%);
+    font-family:var(--rdr-font-mono);font-size:9.5px;font-weight:500;
+    text-transform:uppercase;letter-spacing:0.14em;color:var(--rdr-ink-mute);
+    white-space:nowrap;
+  }
+
+  .compass{
+    position:absolute;bottom:18px;right:20px;z-index:20;
+    width:54px;height:54px;border-radius:99px;
+    border:1.5px solid var(--rdr-ink);background:rgba(244,240,232,0.7);
+    display:flex;align-items:center;justify-content:center;
+    font-family:var(--rdr-font-display);font-weight:700;font-size:13px;
+    color:var(--rdr-ink);
+  }
+  .compass::before{content:"N";position:absolute;top:6px;color:#e6195b}
+  .compass::after{
+    content:"";position:absolute;left:50%;top:14px;width:0;height:0;
+    border:5px solid transparent;border-bottom-color:#e6195b;transform:translateX(-50%);
+  }
+  .scale{
+    position:absolute;bottom:22px;left:24px;z-index:20;
+    display:flex;align-items:center;gap:8px;
+    font-family:var(--rdr-font-mono);font-size:9.5px;
+    text-transform:uppercase;letter-spacing:0.16em;color:var(--rdr-ink-mute);
+  }
+  .scale .bar{
+    width:80px;height:6px;border:1.5px solid var(--rdr-ink);position:relative;
+    background:linear-gradient(90deg,var(--rdr-ink) 50%,transparent 50%) 0/20px 6px;
+  }
+  .scale .bar::after{content:"0 — 250 — 500 km";position:absolute;top:9px;left:0;white-space:nowrap}
+
+  .map-attrib{
+    position:absolute;bottom:8px;right:84px;z-index:20;
+    font-family:var(--rdr-font-mono);font-size:9px;
+    color:var(--rdr-ink-mute);text-transform:uppercase;letter-spacing:0.14em;
+  }
+
+  /* ---- zoom wrapper (animates map + nodes together) ---- */
+  .map-wrap{
+    position:absolute;inset:0;
+    transform-origin:0 0;
+    transition:transform 0.55s cubic-bezier(0.4,0,0.2,1);
+    will-change:transform;
+  }
+
+  /* ---- zoom reset button ---- */
+  .zoom-reset{
+    position:absolute;bottom:68px;left:24px;z-index:25;
+    display:none;align-items:center;gap:6px;
+    height:30px;padding:0 12px;border-radius:99px;
+    background:rgba(244,240,232,0.92);border:1.5px solid var(--rdr-ink);
+    cursor:pointer;
+    font-family:var(--rdr-font-mono);font-size:9.5px;
+    text-transform:uppercase;letter-spacing:0.14em;color:var(--rdr-ink);
+    box-shadow:0 4px 14px rgba(26,23,21,0.14);
+    transition:all .15s var(--rdr-ease);
+    animation:fadeInUp .3s ease forwards;
+  }
+  .zoom-reset:hover{background:var(--rdr-ink);color:#fff}
+  @keyframes fadeInUp{
+    from{opacity:0;transform:translateY(6px)}
+    to{opacity:1;transform:translateY(0)}
+  }
+
+  /* ---- scroll hint (mobile only) ---- */
+  .scroll-hint{
+    position:absolute;bottom:16px;left:50%;transform:translateX(-50%);
+    z-index:25;display:none;align-items:center;gap:8px;
+    background:#e6195b;color:#fff;border-radius:99px;
+    padding:11px 20px;
+    font-family:var(--rdr-font-mono);font-size:10.5px;
+    text-transform:uppercase;letter-spacing:0.14em;white-space:nowrap;
+    box-shadow:0 6px 24px rgba(230,25,91,0.40);
+    pointer-events:none;
+  }
+  .scroll-hint.visible{
+    display:flex;
+    animation:shFloat .45s ease forwards, shFade .35s ease 2.4s forwards;
+  }
+  @keyframes shFloat{
+    from{opacity:0;transform:translateX(-50%) translateY(10px)}
+    to{opacity:1;transform:translateX(-50%) translateY(0)}
+  }
+  @keyframes shFade{to{opacity:0}}
+  .scroll-hint-arrow{
+    display:inline-block;
+    animation:bounce 1s ease-in-out infinite;
+  }
+  @keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(3px)}}
+
+  /* FICHA panel */
+  .ficha{
+    background:#f4f0e8;border:1.5px solid var(--rdr-ink);border-radius:14px;
+    overflow:hidden;display:flex;flex-direction:column;
+    box-shadow:0 24px 60px rgba(26,23,21,.10);position:relative;
+  }
+  .ficha::before{
+    content:"";position:absolute;top:0;right:0;
+    width:0;height:0;
+    border-top:54px solid #e6195b;border-left:54px solid transparent;z-index:5;
+  }
+  .ficha-hero{
+    padding:20px 28px 22px;background:#1a1715;color:#fff;
+    border-bottom:1.5px solid var(--rdr-ink);position:relative;overflow:hidden;
+  }
+  .ficha-hero::after{
+    content:"";position:absolute;top:0;left:-2px;width:6px;height:100%;background:#e6195b;
+  }
+  .ficha-hero .eye{
+    font-family:var(--rdr-font-mono);font-size:10.5px;
+    text-transform:uppercase;letter-spacing:0.16em;color:#e6195b;margin-bottom:4px;
+    display:inline-flex;align-items:center;gap:8px;
+  }
+  .ficha-hero .eye::before{
+    content:"";width:7px;height:7px;border-radius:99px;background:#e6195b;
+    box-shadow:0 0 0 3px rgba(230,25,91,.25);
+    animation:p 1.6s ease-in-out infinite;
+  }
+  /* City name — the massive editorial centrepiece */
+  .ficha-city{
+    font-family:var(--rdr-font-display);font-weight:700;text-transform:uppercase;
+    font-size:clamp(64px, 10vw, 120px);
+    line-height:0.83;letter-spacing:-0.025em;
+    color:#fff;margin:6px 0 4px;
+    /* let it overflow the right edge gracefully on narrow panels */
+    overflow:hidden;white-space:nowrap;text-overflow:clip;
+  }
+  .ficha-dept{
+    font-family:var(--rdr-font-mono);font-size:11px;
+    text-transform:uppercase;letter-spacing:0.18em;
+    color:rgba(255,255,255,0.45);margin-bottom:10px;
+  }
+  .ficha-red-name{
+    font-family:var(--rdr-font-editorial);font-style:italic;
+    font-size:14px;line-height:1.45;
+    color:rgba(255,255,255,0.65);
+    border-top:1px solid rgba(255,255,255,0.12);padding-top:10px;
+  }
+
+  .ficha-body{padding:24px 28px 28px;overflow-y:auto;flex:1}
+  .row{
+    display:grid;grid-template-columns:120px 1fr;gap:14px;
+    padding:14px 0;border-bottom:1px dashed var(--rdr-line-strong);
+  }
+  .row:last-child{border-bottom:none}
+  .row .k{
+    font-family:var(--rdr-font-mono);font-size:11px;
+    text-transform:uppercase;letter-spacing:0.16em;color:var(--rdr-ink-mute);
+    line-height:1.4;
+  }
+  .row .v{
+    font-family:var(--rdr-font-body);font-size:16px;line-height:1.55;
+    color:var(--rdr-ink);text-wrap:pretty;
+  }
+  .row .v b{font-weight:600;color:var(--rdr-ink)}
+  .row .v.lead{
+    font-family:var(--rdr-font-editorial);font-style:italic;
+    font-size:19px;color:var(--rdr-morado);line-height:1.38;text-wrap:pretty;
+  }
+  .row .v .num{
+    font-family:var(--rdr-font-display);font-weight:700;
+    font-size:32px;line-height:1;color:#e6195b;letter-spacing:0;
+    display:inline-block;margin-right:8px;vertical-align:-2px;
+  }
+  .row .v .small{
+    display:block;margin-top:4px;
+    font-family:var(--rdr-font-mono);font-size:10.5px;
+    color:var(--rdr-ink-mute);text-transform:uppercase;letter-spacing:0.14em;
+  }
+  .row .v .person{
+    display:block;padding:6px 0;
+  }
+  .row .v .person + .person{border-top:1px dashed rgba(26,23,21,0.18);margin-top:6px;padding-top:10px}
+  .row .v a{color:var(--rdr-morado);text-decoration:none;border-bottom:1px solid var(--rdr-morado)}
+  .row .v a:hover{color:#e6195b;border-bottom-color:#e6195b}
+
+  .ficha-footer{
+    padding:18px 28px;border-top:1.5px solid var(--rdr-ink);
+    background:rgba(26,23,21,0.04);
+    display:flex;align-items:center;justify-content:space-between;gap:12px;
+  }
+  .nav-prev-next{display:flex;gap:8px}
+  .ctrl{
+    height:38px;padding:0 16px;border-radius:99px;
+    background:transparent;color:var(--rdr-ink);
+    border:1.5px solid var(--rdr-ink);cursor:pointer;
+    font-family:var(--rdr-font-display);font-weight:700;
+    text-transform:uppercase;font-size:12px;letter-spacing:0.06em;
+    display:inline-flex;align-items:center;gap:6px;
+    transition:all .14s var(--rdr-ease);
+  }
+  .ctrl:hover{background:var(--rdr-ink);color:#fff}
+  .ctrl.primary{background:#e6195b;border-color:var(--rdr-ink);color:#fff}
+  .ctrl.primary:hover{background:var(--rdr-ink)}
+  .counter{
+    font-family:var(--rdr-font-mono);font-size:11px;
+    text-transform:uppercase;letter-spacing:0.16em;color:var(--rdr-ink-mute);
+  }
+  .counter b{color:#e6195b;font-weight:700}
+
+  /* ================================================================
+     RESPONSIVE
+     ================================================================ */
+
+  /* --- Tablet / stacked (≤ 1079 px) ----------------------------- */
+  @media (max-width:1079px){
+    main{
+      grid-template-columns:1fr;
+      padding:20px 24px 60px;
+      gap:20px;
+    }
+    /* On stacked layout the ficha sits below — cap height so it
+       doesn't push everything off screen on landscape tablets */
+    .ficha{ max-height:70vh; }
+    .ficha-body{ max-height:calc(70vh - 180px); }
+  }
+
+  /* --- Large phones / small tablets in portrait (≤ 767 px) ------- */
+  @media (max-width:767px){
+    /* a11y bar: tighter, wrap the buttons */
+    .a11y-strip{
+      padding:7px 16px;
+      flex-wrap:wrap;
+      row-gap:4px;
+    }
+
+    /* header: stack brand + meta, reduce h1 */
+    header.top{
+      flex-direction:column;
+      align-items:flex-start;
+      gap:10px;
+      padding:14px 18px 12px;
+    }
+    .brand h1{ font-size:28px; }
+    header .meta{ text-align:left; }
+
+    /* main */
+    main{ padding:14px 14px 40px; gap:14px; }
+
+    /* stage head: smaller title + legend */
+    .stage-head{ top:12px; left:14px; right:14px; gap:10px; }
+    .stage-head h2{ font-size:22px; }
+    .legend{ padding:7px 9px; gap:3px; font-size:9px; }
+    .legend i{ width:7px; height:7px; }
+
+    /* node dots: slightly larger tap targets */
+    .node.nodo{ width:22px; height:22px; }
+
+    /* node labels: hide non-selected ones — too cramped on mobile.
+       Only the active label stays visible (in red). */
+    .node-label{ opacity:0; pointer-events:none; transition:opacity .2s; }
+    .node-label.selected{
+      opacity:1;
+      font-size:12px;
+    }
+    .node-label.selected small{ font-size:8.5px; }
+
+    /* compass + scale: compress */
+    .compass{ width:40px; height:40px; font-size:11px; bottom:12px; right:12px; }
+    .scale{ bottom:14px; left:12px; font-size:8.5px; }
+    .scale .bar{ width:60px; }
+    .map-attrib{ display:none; }
+
+    /* ficha: uncap height (it's already below the map in stacked layout) */
+    .ficha{ max-height:none; }
+    .ficha-body{ max-height:none; }
+
+    /* ficha hero: bigger city name on narrow screens */
+    .ficha-hero{ padding:18px 20px 20px; }
+    .ficha-city{ font-size:clamp(56px, 16vw, 96px); }
+    .ficha-dept{ font-size:13px; letter-spacing:0.16em; }
+    .ficha-red-name{ font-size:16px; line-height:1.5; }
+
+    /* ficha body: stack rows vertically so text has room to breathe */
+    .ficha-body{ padding:20px 20px 24px; }
+    .row{
+      display:flex;
+      flex-direction:column;
+      gap:5px;
+      padding:14px 0;
+    }
+    .row .k{
+      font-size:11px;
+      font-weight:700;
+      letter-spacing:0.2em;
+      color:var(--rdr-ink); /* stronger contrast for label */
+    }
+    .row .v{ font-size:18px; line-height:1.5; }
+    .row .v.lead{ font-size:18px; line-height:1.5; }
+    .row .v .num{ font-size:32px; }
+    .row .v .small{ font-size:12px; }
+    .row .v .person b{ font-size:17px; }
+    .row .v .person small{ font-size:13px; display:block; margin-top:2px; }
+
+    /* footer controls */
+    .ficha-footer{ padding:16px 20px; }
+    .ctrl{ height:44px; padding:0 20px; font-size:13px; }
+    .counter{ font-size:12px; }
+  }
+
+  /* --- Small phones (≤ 480 px) ----------------------------------- */
+  @media (max-width:480px){
+    .brand h1{ font-size:24px; }
+    .brand .eye{ font-size:9.5px; }
+    /* Minimal a11y strip — just the buttons */
+    .a11y-strip .skip{ display:none; }
+    /* Stage fills nearly full width */
+    main{ padding:10px 10px 32px; gap:10px; }
+    .stage-head h2{ font-size:18px; }
+    .legend{ font-size:8.5px; }
+    /* ficha hero */
+    .ficha-city{ font-size:clamp(52px, 15vw, 80px); }
+    .ficha-red-name{ font-size:15px; }
+    /* ficha body: keep vertical stacking, refine spacing */
+    .ficha-body{ padding:16px 16px 20px; }
+    .row{ padding:12px 0; gap:4px; }
+    .row .v{ font-size:17px; }
+    .row .v.lead{ font-size:17px; }
+    .ctrl{ height:46px; font-size:14px; }
+  }
+
+  /* ================================================================
+     ADD-NODE BUTTON
+     ================================================================ */
+  .add-node-btn{
+    display:inline-flex;align-items:center;gap:8px;
+    height:40px;padding:0 20px;border-radius:99px;
+    background:#e6195b;border:1.5px solid var(--rdr-ink);color:#fff;
+    font-family:var(--rdr-font-display);font-weight:700;
+    text-transform:uppercase;font-size:12px;letter-spacing:0.06em;
+    cursor:pointer;transition:all .15s var(--rdr-ease);
+    box-shadow:0 4px 18px rgba(230,25,91,0.30);
+    flex-shrink:0;
+  }
+  .add-node-btn:hover{background:var(--rdr-ink);box-shadow:none}
+  .add-node-btn .plus{font-size:18px;line-height:1;font-weight:400}
+
+  /* ================================================================
+     FORM DRAWER — replaces ficha panel content when open
+     ================================================================ */
+  .ficha{position:relative;transition:none}
+  .form-drawer{
+    display:none;flex-direction:column;
+    position:absolute;inset:0;z-index:10;
+    background:#f4f0e8;border-radius:14px;overflow:hidden;
+  }
+  .form-drawer.open{display:flex}
+
+  .form-drawer-head{
+    padding:20px 28px 16px;background:#1a1715;color:#fff;
+    border-bottom:1.5px solid var(--rdr-ink);flex-shrink:0;position:relative;
+  }
+  .form-drawer-head::after{
+    content:"";position:absolute;top:0;left:-2px;width:6px;height:100%;background:#e6195b;
+  }
+  .form-drawer-head .eye{
+    font-family:var(--rdr-font-mono);font-size:10.5px;
+    text-transform:uppercase;letter-spacing:0.16em;color:#e6195b;margin-bottom:4px;
+  }
+  .form-drawer-head h2{
+    font-family:var(--rdr-font-display);font-weight:700;text-transform:uppercase;
+    font-size:22px;margin:0;color:#fff;letter-spacing:0.01em;
+  }
+  .form-close{
+    position:absolute;top:16px;right:20px;
+    background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);
+    color:#fff;width:32px;height:32px;border-radius:99px;
+    cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;
+    transition:background .15s;
+  }
+  .form-close:hover{background:rgba(230,25,91,0.5)}
+
+  /* Step indicator */
+  .step-bar{
+    display:flex;align-items:center;padding:14px 28px;gap:0;
+    background:rgba(26,23,21,0.04);border-bottom:1px solid var(--rdr-line);
+    flex-shrink:0;
+  }
+  .step-pip{
+    display:flex;flex-direction:column;align-items:center;gap:3px;flex:1;
+    position:relative;
+  }
+  .step-pip::after{
+    content:"";position:absolute;top:11px;left:50%;width:100%;height:1.5px;
+    background:var(--rdr-line);z-index:0;
+  }
+  .step-pip:last-child::after{display:none}
+  .step-pip .dot{
+    width:22px;height:22px;border-radius:99px;
+    border:1.5px solid var(--rdr-line);background:#f4f0e8;
+    font-family:var(--rdr-font-mono);font-size:9px;font-weight:700;
+    display:flex;align-items:center;justify-content:center;
+    color:var(--rdr-ink-mute);z-index:1;position:relative;
+    transition:all .25s;
+  }
+  .step-pip .slbl{
+    font-family:var(--rdr-font-mono);font-size:9px;
+    text-transform:uppercase;letter-spacing:0.14em;
+    color:var(--rdr-ink-mute);text-align:center;
+  }
+  .step-pip.active .dot{background:#e6195b;border-color:#e6195b;color:#fff}
+  .step-pip.active .slbl{color:#e6195b;font-weight:700}
+  .step-pip.done .dot{background:var(--rdr-ink);border-color:var(--rdr-ink);color:#fff}
+  .step-pip.done::after{background:var(--rdr-ink)}
+
+  /* Form body */
+  .form-body{flex:1;overflow-y:auto;padding:22px 28px}
+  .step-panel{display:none}
+  .step-panel.active{display:block}
+
+  .field-group{margin-bottom:18px}
+  .field-group label{
+    display:block;margin-bottom:6px;
+    font-family:var(--rdr-font-mono);font-size:10.5px;
+    text-transform:uppercase;letter-spacing:0.16em;
+    color:var(--rdr-ink-mute);
+  }
+  .field-group label .req{color:#e6195b}
+  .field-group input,.field-group select,.field-group textarea{
+    width:100%;padding:10px 14px;
+    background:rgba(255,255,255,0.7);color:var(--rdr-ink);
+    border:1.5px solid rgba(26,23,21,0.25);border-radius:8px;
+    font-family:var(--rdr-font-body);font-size:15px;
+    transition:border-color .15s;outline:none;
+  }
+  .field-group input:focus,.field-group select:focus,.field-group textarea:focus{
+    border-color:#e6195b;background:#fff;
+  }
+  .field-group textarea{resize:vertical;min-height:90px;line-height:1.5}
+  .field-group.error input,.field-group.error select,.field-group.error textarea{
+    border-color:#e6195b;background:rgba(230,25,91,0.04);
+  }
+  .field-error{
+    font-family:var(--rdr-font-mono);font-size:10px;
+    color:#e6195b;letter-spacing:0.12em;margin-top:4px;display:none;
+  }
+  .field-group.error .field-error{display:block}
+  .field-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .step-title{
+    font-family:var(--rdr-font-display);font-weight:700;
+    text-transform:uppercase;font-size:16px;letter-spacing:0.03em;
+    color:var(--rdr-ink);margin:0 0 18px;padding-bottom:10px;
+    border-bottom:1.5px solid var(--rdr-ink);
+  }
+  .cond-toggle{display:flex;align-items:center;gap:10px;margin-bottom:16px;cursor:pointer}
+  .cond-toggle input[type=checkbox]{width:18px;height:18px;accent-color:#e6195b;cursor:pointer}
+  .cond-toggle span{
+    font-family:var(--rdr-font-mono);font-size:10.5px;
+    text-transform:uppercase;letter-spacing:0.14em;color:var(--rdr-ink-soft);
+  }
+  .cond-field{display:none}
+  .cond-field.show{display:block}
+
+  /* Geocoding status */
+  .geo-status{
+    padding:10px 14px;border-radius:8px;margin-top:8px;
+    font-family:var(--rdr-font-mono);font-size:10.5px;
+    letter-spacing:0.12em;text-transform:uppercase;
+    display:none;
+  }
+  .geo-status.loading{display:block;background:rgba(74,42,122,0.08);color:var(--rdr-morado)}
+  .geo-status.ok{display:block;background:rgba(0,140,80,0.08);color:#008c50}
+  .geo-status.fail{display:block;background:rgba(230,25,91,0.08);color:#e6195b}
+
+  /* Form footer */
+  .form-footer{
+    padding:16px 28px;border-top:1.5px solid var(--rdr-ink);
+    background:rgba(26,23,21,0.04);
+    display:flex;align-items:center;justify-content:space-between;gap:12px;
+    flex-shrink:0;
+  }
+  .form-step-counter{
+    font-family:var(--rdr-font-mono);font-size:11px;
+    text-transform:uppercase;letter-spacing:0.16em;color:var(--rdr-ink-mute);
+  }
+  .form-step-counter b{color:#e6195b}
+
+  /* Success screen */
+  .form-success{
+    display:none;flex-direction:column;align-items:center;
+    justify-content:center;text-align:center;padding:40px 28px;flex:1;
+  }
+  .form-success.show{display:flex}
+  .form-success .big{
+    font-family:var(--rdr-font-display);font-weight:700;
+    text-transform:uppercase;font-size:38px;line-height:0.9;
+    color:var(--rdr-ink);margin:16px 0 8px;
+  }
+  .form-success .big em{
+    font-family:var(--rdr-font-editorial);font-style:italic;
+    font-weight:400;color:#e6195b;text-transform:none;
+  }
+  .form-success p{
+    font-family:var(--rdr-font-body);font-size:15px;
+    color:var(--rdr-ink-soft);line-height:1.55;max-width:280px;
+  }
+  .check-circle{
+    width:64px;height:64px;border-radius:99px;
+    background:#e6195b;display:flex;align-items:center;justify-content:center;
+    font-size:28px;color:#fff;
+    box-shadow:0 8px 28px rgba(230,25,91,0.35);
+  }
+
+  /* Config panel */
+  .config-btn{
+    position:fixed;bottom:24px;right:24px;z-index:100;
+    width:42px;height:42px;border-radius:99px;
+    background:rgba(244,240,232,0.92);border:1.5px solid var(--rdr-ink);
+    display:flex;align-items:center;justify-content:center;
+    cursor:pointer;font-size:18px;box-shadow:0 4px 14px rgba(26,23,21,0.14);
+    transition:all .15s;
+  }
+  .config-btn:hover{background:var(--rdr-ink);color:#fff}
+  .config-modal{
+    display:none;position:fixed;inset:0;z-index:200;
+    background:rgba(26,23,21,0.55);align-items:center;justify-content:center;
+  }
+  .config-modal.open{display:flex}
+  .config-box{
+    background:#f4f0e8;border:1.5px solid var(--rdr-ink);border-radius:14px;
+    padding:32px;width:min(480px,90vw);
+    box-shadow:0 24px 60px rgba(26,23,21,.18);
+  }
+  .config-box h3{
+    font-family:var(--rdr-font-display);font-weight:700;
+    text-transform:uppercase;font-size:18px;margin:0 0 6px;
+  }
+  .config-box p{
+    font-family:var(--rdr-font-mono);font-size:10.5px;
+    color:var(--rdr-ink-mute);letter-spacing:0.12em;margin-bottom:20px;
+  }
+  .config-box input{
+    width:100%;padding:10px 14px;border:1.5px solid rgba(26,23,21,0.25);
+    border-radius:8px;font-size:13px;font-family:var(--rdr-font-mono);
+    background:rgba(255,255,255,0.7);outline:none;margin-bottom:14px;
+  }
+  .config-box input:focus{border-color:#e6195b;background:#fff}
+  .config-actions{display:flex;gap:10px;justify-content:flex-end}
+
+  @media(max-width:767px){
+    .add-node-btn{height:38px;padding:0 14px;font-size:11px}
+    .form-body{padding:16px 18px}
+    .field-row{grid-template-columns:1fr}
+    .form-drawer-head{padding:16px 18px 14px}
+    .form-drawer-head h2{font-size:18px}
+    .form-footer{padding:14px 18px}
+    .step-bar{padding:12px 14px}
+    .config-btn{bottom:16px;right:16px}
+  }
+</style>
+</head>
+<body>
+
+<div class="a11y-strip">
+  <a href="#contenido" class="skip">Saltar al contenido</a>
+  <div class="rdr-a11y-nav" aria-label="Accesibilidad">
+    <span>Tamaño</span>
+    <button>A−</button><button>A</button><button>A+</button>
+    <button style="width:auto;padding:0 12px;height:26px;font-size:10px">Alto contraste</button>
+  </div>
+</div>
+
+<header class="top">
+  <div class="brand">
+    <div class="eye">Ministerio de las Culturas, las Artes y los Saberes</div>
+    <h1>Red <em>de redes</em></h1>
+    <div class="doc"><b>Mapa de nodos priorizados</b> · Implementación 2026</div>
+  </div>
+  <div class="meta">
+    <div class="pulse">Mapa en construcción</div>
+    <div><b id="nodoCount">3</b> nodos cargados</div>
+    <div>Junio 15 — Julio 15 · 2026</div>
+  </div>
+  <button class="add-node-btn" id="addNodeBtn" onclick="openFormDrawer()">
+    <span class="plus">+</span> Agregar nodo
+  </button>
+</header>
+
+<main id="contenido">
+
+  <!-- ====== MAP ====== -->
+  <section class="stage">
+    <div class="stage-head">
+      <div>
+        <div class="lbl">Mapa · territorio nacional</div>
+        <h2>República de <em>Colombia</em></h2>
+      </div>
+      <div class="legend">
+        <span>Nodo seleccionado <i style="background:#e6195b"></i></span>
+        <span>Nodo priorizado <i style="background:var(--rdr-morado)"></i></span>
+        <span>Capital <i style="background:transparent;border:1.5px solid #1a1715"></i></span>
+      </div>
+    </div>
+
+    <div class="map-loading" id="loading">
+      <div class="spinner"></div>
+      <div>Cargando geografía · Colombia</div>
+    </div>
+
+    <!-- map-wrap: single element we transform for zoom (SVG + nodes move together) -->
+    <div class="map-wrap" id="mapWrap">
+      <svg class="map-svg" id="mapSvg" viewBox="0 0 880 880" preserveAspectRatio="xMidYMid meet">
+        <defs>
+          <filter id="ink"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" seed="9"/><feDisplacementMap in="SourceGraphic" scale="0.6"/></filter>
+        </defs>
+        <g id="depts" fill="rgba(234,217,204,0.4)" stroke="rgba(26,23,21,0.35)" stroke-width="0.7" stroke-linejoin="round"></g>
+        <path id="outline" fill="none" stroke="var(--rdr-ink)" stroke-width="1.6" stroke-linejoin="round"></path>
+        <!-- mesh: subtle connections from each nodo to capital -->
+        <g id="axons" stroke="#4a2a7a" stroke-width="1.0" fill="none" stroke-opacity="0.55" stroke-dasharray="3 4"></g>
+      </svg>
+      <div class="nodes" id="nodesLayer"></div>
+    </div>
+
+    <!-- zoom reset: appears when map is zoomed in -->
+    <button class="zoom-reset" id="zoomReset" onclick="resetZoom()" aria-label="Ver mapa completo">↺ Vista completa</button>
+
+    <!-- scroll hint: mobile only — appears after selecting a node -->
+    <div class="scroll-hint" id="scrollHint" aria-live="polite">
+      Ver ficha <span class="scroll-hint-arrow">↓</span>
+    </div>
+
+    <div class="map-attrib">geo · DANE / John Guerra</div>
+    <div class="scale"><span class="bar"></span></div>
+    <div class="compass"></div>
+  </section>
+
+  <!-- ====== FICHA ====== -->
+  <aside class="ficha" id="fichaWrap" style="position:relative">
+    <div id="ficha"></div>
+
+    <!-- FORM DRAWER -->
+    <div class="form-drawer" id="formDrawer">
+      <div class="form-drawer-head">
+        <div class="eye">Nuevo nodo · Registro</div>
+        <h2>Agregar nodo priorizado</h2>
+        <button class="form-close" onclick="closeFormDrawer()" aria-label="Cerrar">×</button>
+      </div>
+
+      <!-- Step bar -->
+      <div class="step-bar" id="stepBar">
+        <div class="step-pip active" id="pip1">
+          <div class="dot">01</div>
+          <div class="slbl">Red</div>
+        </div>
+        <div class="step-pip" id="pip2">
+          <div class="dot">02</div>
+          <div class="slbl">Equipo</div>
+        </div>
+        <div class="step-pip" id="pip3">
+          <div class="dot">03</div>
+          <div class="slbl">Territorio</div>
+        </div>
+        <div class="step-pip" id="pip4">
+          <div class="dot">04</div>
+          <div class="slbl">Ejercicio</div>
+        </div>
+      </div>
+
+      <!-- Form body -->
+      <div class="form-body" id="formBody">
+
+        <!-- STEP 1: Identificación de la Red -->
+        <div class="step-panel active" id="step1">
+          <div class="step-title">01 · La red</div>
+          <div class="field-group" id="fg-red">
+            <label>Nombre de la Red (sigla) <span class="req">*</span></label>
+            <input type="text" id="f-red" placeholder="Ej: RADAR, Juntanza, Red HH…">
+            <div class="field-error">Campo obligatorio</div>
+          </div>
+          <div class="field-group" id="fg-redLong">
+            <label>Nombre completo de la Red <span class="req">*</span></label>
+            <input type="text" id="f-redLong" placeholder="Nombre oficial completo">
+            <div class="field-error">Campo obligatorio</div>
+          </div>
+          <div class="field-group" id="fg-city">
+            <label>Nodo priorizado (ciudad / lugar) <span class="req">*</span></label>
+            <input type="text" id="f-city" placeholder="Ej: Quibdó, Pasto, Leticia…">
+            <div class="field-error">Campo obligatorio</div>
+          </div>
+        </div>
+
+        <!-- STEP 2: Equipo humano -->
+        <div class="step-panel" id="step2">
+          <div class="step-title">02 · Equipo humano</div>
+          <div class="field-group" id="fg-repNombre">
+            <label>Nombre del representante del nodo <span class="req">*</span></label>
+            <input type="text" id="f-repNombre" placeholder="Nombre completo">
+            <div class="field-error">Campo obligatorio</div>
+          </div>
+          <div class="field-group" id="fg-repTel">
+            <label>Contacto del representante (celular) <span class="req">*</span></label>
+            <input type="tel" id="f-repTel" placeholder="3XX XXX XXXX">
+            <div class="field-error">Campo obligatorio</div>
+          </div>
+          <div class="field-group">
+            <label>Correo electrónico</label>
+            <input type="email" id="f-correo" placeholder="correo@dominio.com">
+          </div>
+          <div class="field-group" id="fg-delegado">
+            <label>Nombre del delegado de Minculturas <span class="req">*</span></label>
+            <input type="text" id="f-delegado" placeholder="Nombre completo">
+            <div class="field-error">Campo obligatorio</div>
+          </div>
+          <div class="field-group">
+            <label>Dependencia del delegado</label>
+            <input type="text" id="f-grupo" placeholder="Ej: Dirección de Poblaciones, DACMI…">
+          </div>
+        </div>
+
+        <!-- STEP 3: Territorio -->
+        <div class="step-panel" id="step3">
+          <div class="step-title">03 · Territorio</div>
+          <div class="field-group" id="fg-departamento">
+            <label>Departamento <span class="req">*</span></label>
+            <select id="f-departamento">
+              <option value="">— Seleccionar —</option>
+              <option>Amazonas</option><option>Antioquia</option><option>Arauca</option>
+              <option>Atlántico</option><option>Bogotá D.C.</option><option>Bolívar</option>
+              <option>Boyacá</option><option>Caldas</option><option>Caquetá</option>
+              <option>Casanare</option><option>Cauca</option><option>Cesar</option>
+              <option>Chocó</option><option>Córdoba</option><option>Cundinamarca</option>
+              <option>Guainía</option><option>Guaviare</option><option>Huila</option>
+              <option>La Guajira</option><option>Magdalena</option><option>Meta</option>
+              <option>Nariño</option><option>Norte de Santander</option><option>Putumayo</option>
+              <option>Quindío</option><option>Risaralda</option>
+              <option>San Andrés y Providencia</option><option>Santander</option>
+              <option>Sucre</option><option>Tolima</option><option>Valle del Cauca</option>
+              <option>Vaupés</option><option>Vichada</option>
+            </select>
+            <div class="field-error">Selecciona un departamento</div>
+          </div>
+          <div class="field-row">
+            <div class="field-group" id="fg-municipio">
+              <label>Municipio <span class="req">*</span></label>
+              <input type="text" id="f-municipio" placeholder="Municipio">
+              <div class="field-error">Campo obligatorio</div>
+            </div>
+            <div class="field-group">
+              <label>Vereda / Barrio</label>
+              <input type="text" id="f-vereda" placeholder="Vereda o barrio">
+            </div>
+          </div>
+          <div class="field-group">
+            <label>Dirección exacta</label>
+            <input type="text" id="f-direccion" placeholder="Calle, carrera, número…">
+          </div>
+          <div class="geo-status" id="geoStatus"></div>
+          <hr style="border:none;border-top:1px dashed var(--rdr-line);margin:18px 0">
+          <label class="cond-toggle">
+            <input type="checkbox" id="f-lugarDif" onchange="toggleLugar()">
+            <span>El lugar de la actividad es diferente a la ubicación del nodo</span>
+          </label>
+          <div class="cond-field" id="condLugar">
+            <div class="field-group">
+              <label>Lugar de la actividad</label>
+              <input type="text" id="f-lugar" placeholder="Dirección o nombre del lugar">
+            </div>
+          </div>
+        </div>
+
+        <!-- STEP 4: Ejercicio -->
+        <div class="step-panel" id="step4">
+          <div class="step-title">04 · El ejercicio</div>
+          <div class="field-group" id="fg-org">
+            <label>Número de organizaciones que agrupa el nodo <span class="req">*</span></label>
+            <input type="number" id="f-org" min="1" placeholder="Ej: 15">
+            <div class="field-error">Ingresa un número válido</div>
+          </div>
+          <div class="field-group" id="fg-fortaleza">
+            <label>Fortaleza que destaca del trabajo del nodo <span class="req">*</span></label>
+            <textarea id="f-fortaleza" placeholder="Describe la principal fortaleza del nodo…"></textarea>
+            <div class="field-error">Campo obligatorio</div>
+          </div>
+          <div class="field-group" id="fg-fecha">
+            <label>Fecha posible del ejercicio de implementación <span class="req">*</span></label>
+            <input type="date" id="f-fecha" min="2026-06-15" max="2026-07-15">
+            <div class="field-error">La fecha debe estar entre el 15 jun y el 15 jul de 2026</div>
+          </div>
+          <div class="field-group">
+            <label>Nota sobre la fecha (opcional)</label>
+            <input type="text" id="f-fechaNote" placeholder="Ej: Tentativa, a concertar…">
+          </div>
+        </div>
+
+        <!-- SUCCESS SCREEN -->
+        <div class="form-success" id="formSuccess">
+          <div class="check-circle">✓</div>
+          <div class="big">Nodo <em>registrado</em></div>
+          <p>El nodo ha sido agregado al mapa. Puedes verlo seleccionándolo en la lista.</p>
+          <button class="ctrl primary" onclick="closeFormDrawer()" style="margin-top:18px">Ver en el mapa</button>
+        </div>
+
+      </div><!-- /form-body -->
+
+      <!-- Form footer (nav) -->
+      <div class="form-footer" id="formFooter">
+        <div class="form-step-counter">Paso <b id="stepNumLabel">1</b> de 4</div>
+        <div style="display:flex;gap:8px">
+          <button class="ctrl" id="formPrevBtn" onclick="formPrev()" style="display:none">← Anterior</button>
+          <button class="ctrl primary" id="formNextBtn" onclick="formNext()">Siguiente →</button>
+        </div>
+      </div>
+
+    </div><!-- /form-drawer -->
+  </aside>
+
+</main>
+
+<!-- Gear button for Google Sheets config -->
+<button class="config-btn" onclick="openConfigModal()" title="Configurar sincronización">⚙</button>
+
+<!-- Config modal -->
+<div class="config-modal" id="configModal">
+  <div class="config-box">
+    <h3>Sincronización en la nube</h3>
+    <p>Pega la URL de tu Google Apps Script para activar el guardado automático en Google Sheets. Deja en blanco para usar almacenamiento local.</p>
+    <input type="url" id="sheetsUrlInput" placeholder="https://script.google.com/macros/s/…/exec">
+    <div class="config-actions">
+      <button class="ctrl" onclick="closeConfigModal()">Cancelar</button>
+      <button class="ctrl primary" onclick="saveConfig()">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* =====================================================================
+   NODES — datos reales según correos de Mincultura (Dirección de
+   Poblaciones + DACMI). Solo estos 3 son interactivos.
+===================================================================== */
+const nodos = [
+  {
+    id:'cucuta',
+    lon:-72.50, lat:7.89, city:'Cúcuta',
+    red:'RADAR',
+    redLong:'Asociación de Radios Comunitarias de Norte de Santander — RADAR',
+    departamento:'Norte de Santander',
+    representantes:[
+      {nombre:'Carlos Elí Guevara', rol:'Representante legal', tel:'320 342 0440'},
+      {nombre:'Martha Isabel Martínez', rol:'Formación y proyectos en la Red Radar', tel:'313 807 1095'},
+    ],
+    correo:'radarnds@gmail.com',
+    web:'https://radarenlared.com/',
+    organizaciones:25,
+    fortaleza:'Acompaña y fortalece las radios comunitarias del departamento. Las 25 emisoras cubren Cúcuta, Ocaña, El Tarra, La Gabarra, Convención y otros 20 municipios — una articulación que conecta producción colaborativa, formación de equipos, gestión de proyectos regionales y representación del sector ante MinTIC.',
+    delegados:[
+      {nombre:'Óscar Javier Bermúdez', rol:'Delegado Mincultura · DACMI'},
+      {nombre:'Yesenia Polanía', rol:'Delegada Mincultura · DACMI'},
+    ],
+    grupo:'DACMI · Grupo de Comunicación, Culturas y Territorios',
+    fecha:'Finales de julio · 2026',
+    fechaNote:'Posibilidad de visitar emisoras cercanas a Cúcuta y El Zulia',
+    lugar:'Cúcuta',
+    direccion:'Av. 5 # 9-58 Ed. Mutuo Auxilio of. 702',
+  },
+  {
+    id:'quibdo',
+    lon:-76.66, lat:5.69, city:'Quibdó',
+    red:'Mujeres del Chocó',
+    redLong:'Red de mujeres artistas, cultoras y sabedoras del Chocó',
+    departamento:'Chocó',
+    representantes:[
+      {nombre:'Nelly Caizamo', rol:'Lideresa', tel:'321 840 3767'},
+    ],
+    correo:'',
+    web:'',
+    organizaciones:15,
+    fortaleza:'Cuidado de la paz y articulación con el fortalecimiento de la Red Internacional de Mujeres artistas, cultoras y sabedoras por la paz.',
+    delegados:[
+      {nombre:'Alba Cecilia Pineda', rol:'Delegada Mincultura · Dirección de Poblaciones'},
+      {nombre:'Alejandra Ballén', rol:'Delegada Mincultura · Dirección de Poblaciones'},
+    ],
+    grupo:'Dirección de Poblaciones',
+    fecha:'18 de junio · 2026',
+    fechaNote:'Tentativa, a concertar con organizaciones',
+    lugar:'Quibdó',
+    direccion:'Por confirmar',
+  },
+  {
+    id:'neiva',
+    lon:-75.28, lat:2.94, city:'Neiva',
+    red:'Juntanza de Jóvenes',
+    redLong:'Juntanza de Jóvenes — Minga del Suroccidente',
+    departamento:'Huila',
+    representantes:[
+      {nombre:'Yiner Quiguantar Cortés', rol:'Vocero', tel:'322 687 0655'},
+    ],
+    correo:'',
+    web:'',
+    organizaciones:40,
+    fortaleza:'Inciden en las decisiones que afectan a las juventudes desde la movilización pacífica, la construcción y resistencia cultural, artística, política y social; defienden la vida, los derechos humanos, el territorio y la paz.',
+    delegados:[
+      {nombre:'William Aguilera', rol:'Delegado Mincultura · Dirección de Poblaciones'},
+    ],
+    grupo:'Dirección de Poblaciones',
+    fecha:'15 de julio · 2026',
+    fechaNote:'Tentativa, a concertar con organizaciones',
+    lugar:'Neiva',
+    direccion:'Por confirmar',
+  },
+];
+
+const bogota = {lon:-74.08, lat:4.61};
+
+/* =====================================================================
+   PROJECTION + MAP RENDER
+   Cargamos GeoJSON real desde el gist de John Guerra (público).
+===================================================================== */
+const W=880, H=880;
+const PAD = 40;
+const GEO_URL = 'https://gist.githubusercontent.com/john-guerra/43c7656821069d00dcbc/raw/be6a6e239cd5b5b803c6e7c2ec405b793a9064dd/Colombia.geo.json';
+
+let projector = null;
+
+async function loadMap(){
+  let geo;
+  try{
+    const res = await fetch(GEO_URL);
+    if(!res.ok) throw new Error('HTTP '+res.status);
+    geo = await res.json();
+  }catch(err){
+    console.error('Falló carga de GeoJSON, usando fallback', err);
+    document.getElementById('loading').innerHTML =
+      '<div style="color:#e6195b">⚠ No se pudo cargar el mapa</div>'+
+      '<div style="font-size:10px">Revisa la conexión y recarga</div>';
+    return;
+  }
+
+  /* compute bounds — pero ignoramos San Andrés (las islas, lon < -79)
+     para no comprimir el continente. San Andrés queda fuera del recorte. */
+  let minLon=Infinity,maxLon=-Infinity,minLat=Infinity,maxLat=-Infinity;
+  function eachPt(coords, fn){
+    if(typeof coords[0]==='number'){ fn(coords); return; }
+    coords.forEach(c=>eachPt(c,fn));
+  }
+  geo.features.forEach(f=>{
+    eachPt(f.geometry.coordinates, ([lon,lat])=>{
+      // skip island archipelago for bounds calc
+      if(lon < -79.5) return;
+      if(lon<minLon)minLon=lon; if(lon>maxLon)maxLon=lon;
+      if(lat<minLat)minLat=lat; if(lat>maxLat)maxLat=lat;
+    });
+  });
+
+  /* simple equirectangular fit, latitude-corrected
+     IMPORTANT: cosLat must be applied BOTH to lonRange (for the scale)
+     AND to (lon - minLon) inside projector (for each point's X).
+     Using cosLat only in one place causes systematic horizontal drift. */
+  const midLat = (minLat+maxLat)/2;
+  const cosLat = Math.cos(midLat * Math.PI/180);
+  const lonRange = (maxLon - minLon) * cosLat;   // width in "corrected" degrees
+  const latRange = (maxLat - minLat);             // height in degrees
+
+  const aw = W - 2*PAD;
+  const ah = H - 2*PAD;
+  // scale: fit the corrected bounding box inside the canvas
+  const sx = aw / lonRange;
+  const sy = ah / latRange;
+  const s  = Math.min(sx, sy) * 0.96;
+  const ox = PAD + (aw - lonRange * s) / 2;
+  const oy = PAD + (ah - latRange * s) / 2;
+
+  projector = function(lon, lat){
+    // apply cosLat to lon offset — same factor used in lonRange → consistent
+    const x = ox + (lon - minLon) * cosLat * s;
+    const y = oy + (maxLat - lat) * s;
+    return {x, y};
+  };
+
+  /* render department polygons — saltarse San Andrés (toda costa lon<-79.5)
+     porque queda fuera del recorte y rompe el clip */
+  const depts = document.getElementById('depts');
+  let deptHTML = '';
+  geo.features.forEach((f, i)=>{
+    const g = f.geometry;
+    const polys = g.type==='Polygon' ? [g.coordinates] : g.coordinates;
+    polys.forEach(poly=>{
+      // skip if first ring is entirely in island lon range
+      const firstPt = poly[0][0];
+      if(firstPt[0] < -79.5) return;
+      let d='';
+      poly.forEach(ring=>{
+        ring.forEach(([lon,lat], k)=>{
+          const p = projector(lon,lat);
+          d += (k===0?'M':'L') + p.x.toFixed(1) + ',' + p.y.toFixed(1);
+        });
+        d += 'Z';
+      });
+      deptHTML += `<path d="${d}"></path>`;
+    });
+  });
+  depts.innerHTML = deptHTML;
+
+  /* render outer outline by drawing a thicker stroke around each polygon */
+  // (we already get departmental seams from depts; outline is the same paths
+  //  rendered with ink stroke on top — handled above)
+
+  /* axons cap → nodos (subtle) */
+  const cap = projector(bogota.lon, bogota.lat);
+  let axHTML = '';
+  nodos.forEach(n=>{
+    const p = projector(n.lon, n.lat);
+    const mx = (cap.x+p.x)/2, my = (cap.y+p.y)/2;
+    const dx = p.x-cap.x, dy = p.y-cap.y;
+    const off = 30 + Math.random()*20;
+    const nx = -dy, ny = dx, nl = Math.hypot(nx,ny)||1;
+    const cx = mx + (nx/nl)*off, cy = my + (ny/nl)*off;
+    axHTML += `<path d="M${cap.x.toFixed(1)},${cap.y.toFixed(1)} Q${cx.toFixed(1)},${cy.toFixed(1)} ${p.x.toFixed(1)},${p.y.toFixed(1)}"/>`;
+  });
+  document.getElementById('axons').innerHTML = axHTML;
+
+  /* place nodes — use PERCENTAGES (not px) so they scale 1:1 with the
+     SVG viewBox (0 0 880 880) regardless of the rendered element width */
+  const toP = (v, dim) => (v / dim * 100).toFixed(3) + '%';
+  const layer = document.getElementById('nodesLayer');
+  let html = '';
+  // Capital reference (small ring, non-clickable)
+  html += `<div class="capital-ref" style="left:${toP(cap.x,W)};top:${toP(cap.y,H)}"></div>`;
+
+  nodos.forEach((n, i)=>{
+    const p = projector(n.lon, n.lat);
+    n._x = p.x; n._y = p.y;
+    // Cúcuta is on the right edge — label to the left; Quibdó is left — label to the right
+    const labelClass = n.id==='quibdo' ? '' : 'left';
+    html += `<button class="node nodo ${i===0?'selected':''}" data-id="${n.id}" style="left:${toP(p.x,W)};top:${toP(p.y,H)}" aria-label="${n.city} — ${n.red}"></button>`;
+    html += `<div class="node-label ${labelClass} ${i===0?'selected':''}" data-label-id="${n.id}" style="left:${toP(p.x,W)};top:${toP(p.y,H)}">${n.city}<small>${n.red}</small></div>`;
+  });
+  layer.innerHTML = html;
+
+  // wire clicks
+  document.querySelectorAll('.node.nodo').forEach(el=>{
+    el.addEventListener('click', ()=> select(el.dataset.id));
+  });
+
+  document.getElementById('loading').style.display='none';
+
+  // Zoom to the initially selected node once the map is ready
+  zoomToNode(nodos[current]);
+}
+
+/* =====================================================================
+   FICHA RENDERING
+===================================================================== */
+const ficha = document.getElementById('ficha');
+let current = 0;
+
+function renderFicha(){
+  const n = nodos[current];
+
+  const repsHTML = n.representantes.map(r=>
+    `<span class="person"><b>${r.nombre}</b><small>${r.rol} · ${r.tel}</small></span>`
+  ).join('');
+
+  const delsHTML = n.delegados.map(d=>
+    `<span class="person"><b>${d.nombre}</b><small>${d.rol}</small></span>`
+  ).join('');
+
+  const contactoExtra = [];
+  if(n.correo) contactoExtra.push(`<a href="mailto:${n.correo}">${n.correo}</a>`);
+  if(n.web) contactoExtra.push(`<a href="${n.web}" target="_blank" rel="noopener">${n.web.replace(/^https?:\/\//,'')}</a>`);
+
+  ficha.innerHTML = `
+    <div class="ficha-hero">
+      <div class="eye">Nodo priorizado · ${String(current+1).padStart(2,'0')} de ${String(nodos.length).padStart(2,'0')}</div>
+      <div class="ficha-city">${n.city}</div>
+      <div class="ficha-dept">${n.departamento}</div>
+      <div class="ficha-red-name">${n.redLong}</div>
+    </div>
+
+    <div class="ficha-body">
+
+      <div class="row">
+        <div class="k">El nodo</div>
+        <div class="v lead">${n.fortaleza}</div>
+      </div>
+
+      <div class="row">
+        <div class="k">Representa</div>
+        <div class="v"><span class="num">${n.organizaciones}</span> organizaciones agrupadas en torno al nodo<small>${n.red}</small></div>
+      </div>
+
+      <div class="row">
+        <div class="k">Representante${n.representantes.length>1?'s':''} del nodo</div>
+        <div class="v">${repsHTML}${contactoExtra.length?`<small style="margin-top:8px">${contactoExtra.join(' · ')}</small>`:''}</div>
+      </div>
+
+      <div class="row">
+        <div class="k">Ubicación</div>
+        <div class="v">${n.city}, ${n.departamento}<small>${n.direccion}</small></div>
+      </div>
+
+      <div class="row">
+        <div class="k">Equipo Mincultura</div>
+        <div class="v">${delsHTML}<small style="margin-top:8px">${n.grupo}</small></div>
+      </div>
+
+      <div class="row">
+        <div class="k">Encuentro</div>
+        <div class="v"><b>${n.fecha}</b><small>${n.fechaNote}</small></div>
+      </div>
+
+    </div>
+
+    <div class="ficha-footer">
+      <div class="counter">Nodo <b>${String(current+1).padStart(2,'0')}</b> · de ${String(nodos.length).padStart(2,'0')}</div>
+      <div class="nav-prev-next">
+        <button class="ctrl" id="prevBtn">← Anterior</button>
+        <button class="ctrl primary" id="nextBtn">Siguiente →</button>
+      </div>
+    </div>
+  `;
+
+  document.getElementById('prevBtn').onclick = ()=>{ const ni = (current-1+nodos.length)%nodos.length; select(nodos[ni].id); };
+  document.getElementById('nextBtn').onclick = ()=>{ const ni = (current+1)%nodos.length; select(nodos[ni].id); };
+}
+
+/* =====================================================================
+   ZOOM — centers the clicked node in the stage viewport
+===================================================================== */
+const ZOOM_S = 2.2; // zoom scale factor
+
+function zoomToNode(n){
+  if(!n || n._x == null) return; // map not loaded yet
+  const stage = document.querySelector('.stage');
+  const W = stage.clientWidth;
+  const H = stage.clientHeight;
+  // n._x / n._y are in 0-880 SVG space; normalize to 0-1
+  const nx = n._x / 880;
+  const ny = n._y / 880;
+  // With transform-origin 0 0 and transform: translate(tx,ty) scale(S):
+  // the point (nx*W, ny*H) maps to (nx*W*S + tx, ny*H*S + ty).
+  // We want that to equal (W/2, H/2) → center of stage.
+  const tx = W/2 - nx * W * ZOOM_S;
+  const ty = H/2 - ny * H * ZOOM_S;
+  const wrap = document.getElementById('mapWrap');
+  wrap.style.transformOrigin = '0 0';
+  wrap.style.transform = `translate(${tx.toFixed(1)}px,${ty.toFixed(1)}px) scale(${ZOOM_S})`;
+  // Show reset button
+  const btn = document.getElementById('zoomReset');
+  btn.style.display = 'flex';
+  // Force re-trigger animation
+  btn.style.animation = 'none';
+  btn.offsetHeight;
+  btn.style.animation = '';
+}
+
+function resetZoom(){
+  const wrap = document.getElementById('mapWrap');
+  wrap.style.transform = 'translate(0px,0px) scale(1)';
+  document.getElementById('zoomReset').style.display = 'none';
+}
+
+/* =====================================================================
+   SCROLL HINT — mobile: animated pill nudging user to scroll down
+===================================================================== */
+let _hintTimer;
+function showScrollHint(){
+  if(window.innerWidth >= 1080) return; // desktop doesn't need it
+  const hint = document.getElementById('scrollHint');
+  hint.classList.remove('visible');
+  clearTimeout(_hintTimer);
+  // Force reflow so the animation restarts cleanly
+  void hint.offsetWidth;
+  hint.classList.add('visible');
+  _hintTimer = setTimeout(()=>{ hint.classList.remove('visible'); }, 3000);
+}
+
+function select(id){
+  current = nodos.findIndex(n=>n.id===id);
+  document.querySelectorAll('.node.nodo').forEach(el=>{
+    el.classList.toggle('selected', el.dataset.id===id);
+  });
+  document.querySelectorAll('.node-label').forEach(el=>{
+    el.classList.toggle('selected', el.dataset.labelId===id);
+  });
+  // Zoom map to selected node
+  zoomToNode(nodos[current]);
+  renderFicha();
+  // Mobile: show hint + auto-scroll to ficha after zoom starts
+  if(window.innerWidth < 1080){
+    showScrollHint();
+    setTimeout(()=>{
+      document.getElementById('ficha').scrollIntoView({behavior:'smooth', block:'start'});
+    }, 600);
+  }
+}
+
+renderFicha();
+loadMap();
+
+/* Click on map background (not on a node) → reset zoom */
+document.querySelector('.stage').addEventListener('click', function(e){
+  if(!e.target.closest('.node, #zoomReset, .stage-head, .legend, .scroll-hint')){
+    resetZoom();
+  }
+});
+
+/* =====================================================================
+   FORM — CONFIG, STORAGE & GOOGLE SHEETS
+===================================================================== */
+const CONFIG = {
+  SHEETS_URL: localStorage.getItem('rdr_sheets_url') || '',
+};
+
+function getStoredNodos(){
+  try{ return JSON.parse(localStorage.getItem('rdr_nodos_v1')||'[]'); }catch(e){ return []; }
+}
+function storeNodoLocal(n){
+  const arr = getStoredNodos(); arr.push(n);
+  localStorage.setItem('rdr_nodos_v1', JSON.stringify(arr));
+}
+async function pushToSheets(n){
+  if(!CONFIG.SHEETS_URL) return;
+  try{
+    await fetch(CONFIG.SHEETS_URL,{
+      method:'POST', mode:'no-cors',
+      headers:{'Content-Type':'text/plain'},
+      body:JSON.stringify(n)
+    });
+  }catch(e){ console.warn('Sheets sync failed',e); }
+}
+async function loadFromSheets(){
+  if(!CONFIG.SHEETS_URL) return [];
+  try{
+    const r = await fetch(CONFIG.SHEETS_URL+'?action=get');
+    return await r.json();
+  }catch(e){ return []; }
+}
+
+/* Load user-added nodes into the map on init */
+async function loadUserNodos(){
+  const stored = getStoredNodos();
+  const sheets = await loadFromSheets();
+  const all = [...stored, ...sheets];
+  // dedupe by id
+  const seen = new Set(nodos.map(n=>n.id));
+  all.forEach(n=>{ if(!seen.has(n.id)){ nodos.push(n); seen.add(n.id); } });
+  updateCounter();
+}
+
+function updateCounter(){
+  const el = document.getElementById('nodoCount');
+  if(el) el.textContent = nodos.length;
+}
+
+/* =====================================================================
+   GEOCODING — Nominatim (OpenStreetMap)
+===================================================================== */
+async function geocode(municipio, departamento){
+  const q = encodeURIComponent(`${municipio}, ${departamento}, Colombia`);
+  const url = `https://nominatim.openstreetmap.org/search?q=${q}&format=json&limit=1&countrycodes=co`;
+  const r = await fetch(url, {headers:{'Accept-Language':'es','User-Agent':'RedDeRedes/1.0'}});
+  const d = await r.json();
+  if(d.length) return {lon:parseFloat(d[0].lon), lat:parseFloat(d[0].lat)};
+  return null;
+}
+
+/* =====================================================================
+   ADD NODE TO MAP (after form submit)
+===================================================================== */
+function addNodoToMap(n){
+  if(!projector || n._x==null) return;
+  const layer = document.getElementById('nodesLayer');
+  const W=880, H=880;
+  const toP = (v,d) => (v/d*100).toFixed(3)+'%';
+  const p = projector(n.lon, n.lat);
+  n._x = p.x; n._y = p.y;
+  // label side based on x position
+  const lblCls = p.x > 440 ? 'left' : '';
+  const btn = document.createElement('button');
+  btn.className='node nodo'; btn.dataset.id=n.id;
+  btn.style.left=toP(p.x,W); btn.style.top=toP(p.y,H);
+  btn.setAttribute('aria-label',`${n.city} — ${n.red}`);
+  btn.addEventListener('click',()=>select(n.id));
+  const lbl = document.createElement('div');
+  lbl.className=`node-label ${lblCls}`; lbl.dataset.labelId=n.id;
+  lbl.style.left=toP(p.x,W); lbl.style.top=toP(p.y,H);
+  lbl.innerHTML=`${n.city}<small>${n.red}</small>`;
+  layer.appendChild(btn); layer.appendChild(lbl);
+  // axon to capital
+  const axons = document.getElementById('axons');
+  const cap = projector(bogota.lon, bogota.lat);
+  const mx=(cap.x+p.x)/2, my=(cap.y+p.y)/2;
+  const dx=p.x-cap.x, dy=p.y-cap.y;
+  const off=30+Math.random()*20;
+  const nx=-dy, ny=dx, nl=Math.hypot(nx,ny)||1;
+  const cx=mx+(nx/nl)*off, cy=my+(ny/nl)*off;
+  const path = document.createElementNS('http://www.w3.org/2000/svg','path');
+  path.setAttribute('d',`M${cap.x.toFixed(1)},${cap.y.toFixed(1)} Q${cx.toFixed(1)},${cy.toFixed(1)} ${p.x.toFixed(1)},${p.y.toFixed(1)}`);
+  axons.appendChild(path);
+}
+
+/* =====================================================================
+   FORM STATE
+===================================================================== */
+let formStep = 1;
+
+function openFormDrawer(){
+  formStep = 1;
+  syncStepUI();
+  resetFormFields();
+  document.getElementById('formSuccess').classList.remove('show');
+  document.getElementById('formBody').style.display='';
+  document.getElementById('formFooter').style.display='';
+  document.getElementById('formDrawer').classList.add('open');
+}
+function closeFormDrawer(){
+  document.getElementById('formDrawer').classList.remove('open');
+}
+function toggleLugar(){
+  const chk = document.getElementById('f-lugarDif');
+  document.getElementById('condLugar').classList.toggle('show', chk.checked);
+}
+
+function syncStepUI(){
+  // panels
+  for(let i=1;i<=4;i++){
+    document.getElementById('step'+i).classList.toggle('active', i===formStep);
+    const pip=document.getElementById('pip'+i);
+    pip.classList.remove('active','done');
+    if(i===formStep) pip.classList.add('active');
+    else if(i<formStep) pip.classList.add('done');
+  }
+  document.getElementById('stepNumLabel').textContent=formStep;
+  document.getElementById('formPrevBtn').style.display = formStep>1?'':'none';
+  document.getElementById('formNextBtn').textContent = formStep<4 ? 'Siguiente →' : 'Guardar nodo ✓';
+  document.getElementById('formBody').scrollTop=0;
+}
+
+const VALIDATIONS = {
+  1:[{fg:'fg-red',f:'f-red'},{fg:'fg-redLong',f:'f-redLong'},{fg:'fg-city',f:'f-city'}],
+  2:[{fg:'fg-repNombre',f:'f-repNombre'},{fg:'fg-repTel',f:'f-repTel'},{fg:'fg-delegado',f:'f-delegado'}],
+  3:[{fg:'fg-departamento',f:'f-departamento'},{fg:'fg-municipio',f:'f-municipio'}],
+  4:[{fg:'fg-org',f:'f-org',num:true},{fg:'fg-fortaleza',f:'f-fortaleza'},
+     {fg:'fg-fecha',f:'f-fecha',date:true}],
+};
+
+function validateStep(){
+  let ok=true;
+  (VALIDATIONS[formStep]||[]).forEach(({fg,f,num,date})=>{
+    const el=document.getElementById(f), grp=document.getElementById(fg);
+    const v=el.value.trim();
+    let err=false;
+    if(!v){ err=true; }
+    else if(num && (isNaN(v)||parseInt(v)<1)){ err=true; }
+    else if(date){
+      const d=new Date(v);
+      const min=new Date('2026-06-15'), max=new Date('2026-07-15');
+      if(isNaN(d)||d<min||d>max) err=true;
+    }
+    grp.classList.toggle('error',err);
+    if(err) ok=false;
+  });
+  return ok;
+}
+
+async function formNext(){
+  if(!validateStep()) return;
+  if(formStep===3) await runGeocode(); // geocode on step 3 advance
+  if(formStep<4){ formStep++; syncStepUI(); return; }
+  // STEP 4 submit
+  await submitForm();
+}
+function formPrev(){ if(formStep>1){ formStep--; syncStepUI(); } }
+
+async function runGeocode(){
+  const municipio=document.getElementById('f-municipio').value.trim();
+  const dept=document.getElementById('f-departamento').value;
+  const gs=document.getElementById('geoStatus');
+  gs.className='geo-status loading'; gs.textContent='◌ Geocodificando ubicación…';
+  try{
+    const coords = await geocode(municipio, dept);
+    if(coords){ gs.className='geo-status ok'; gs.textContent=`✓ Coordenadas encontradas · ${coords.lat.toFixed(4)}°N, ${coords.lon.toFixed(4)}°W`; CONFIG._coords=coords; }
+    else{ gs.className='geo-status fail'; gs.textContent='No se encontraron coordenadas exactas. El nodo se ubicará en el centro del departamento.'; CONFIG._coords=null; }
+  }catch(e){ gs.className='geo-status fail'; gs.textContent='Sin conexión para geocodificar.'; CONFIG._coords=null; }
+}
+
+async function submitForm(){
+  const btn=document.getElementById('formNextBtn');
+  btn.disabled=true; btn.textContent='Guardando…';
+  const city=document.getElementById('f-city').value.trim();
+  const municipio=document.getElementById('f-municipio').value.trim();
+  const dept=document.getElementById('f-departamento').value;
+  const fechaRaw=document.getElementById('f-fecha').value; // YYYY-MM-DD
+  const [yy,mm,dd]=fechaRaw.split('-');
+  const meses=['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+  const fechaStr=`${parseInt(dd)} de ${meses[parseInt(mm)-1]} · ${yy}`;
+  // coords: from geocode or rough centre of departamento
+  let coords = CONFIG._coords;
+  if(!coords){
+    try{ coords = await geocode(dept, 'Colombia'); }catch(e){}
+  }
+  if(!coords) coords={lon:-74.3,lat:4.5}; // fallback: approx centre of Colombia
+  const vereda=document.getElementById('f-vereda').value.trim();
+  const dir=document.getElementById('f-direccion').value.trim();
+  const lugarDif=document.getElementById('f-lugarDif').checked;
+  const n={
+    id: city.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,''),
+    lon:coords.lon, lat:coords.lat,
+    city,
+    red:document.getElementById('f-red').value.trim(),
+    redLong:document.getElementById('f-redLong').value.trim(),
+    departamento:dept,
+    representantes:[{nombre:document.getElementById('f-repNombre').value.trim(), rol:'Representante del nodo', tel:document.getElementById('f-repTel').value.trim()}],
+    correo:document.getElementById('f-correo').value.trim(),
+    web:'',
+    organizaciones:parseInt(document.getElementById('f-org').value)||0,
+    fortaleza:document.getElementById('f-fortaleza').value.trim(),
+    delegados:[{nombre:document.getElementById('f-delegado').value.trim(), rol:document.getElementById('f-grupo').value.trim()||'Delegado Mincultura'}],
+    grupo:document.getElementById('f-grupo').value.trim()||'Minculturas',
+    fecha:fechaStr,
+    fechaNote:document.getElementById('f-fechaNote').value.trim()||'Fecha tentativa',
+    lugar:lugarDif?(document.getElementById('f-lugar').value.trim()||city):city,
+    direccion:[vereda,dir].filter(Boolean).join(' · ')||'Por confirmar',
+    _added: Date.now(),
+  };
+  // Save
+  storeNodoLocal(n);
+  await pushToSheets(n);
+  // Add to live map
+  nodos.push(n);
+  addNodoToMap(n);
+  updateCounter();
+  // Show success
+  document.getElementById('formBody').style.display='none';
+  document.getElementById('formFooter').style.display='none';
+  document.getElementById('formSuccess').classList.add('show');
+  btn.disabled=false;
+}
+
+function resetFormFields(){
+  ['f-red','f-redLong','f-city','f-repNombre','f-repTel','f-correo',
+   'f-delegado','f-grupo','f-municipio','f-vereda','f-direccion',
+   'f-org','f-fortaleza','f-fecha','f-fechaNote','f-lugar'].forEach(id=>{
+    const el=document.getElementById(id); if(el) el.value='';
+  });
+  const dept=document.getElementById('f-departamento'); if(dept) dept.value='';
+  const chk=document.getElementById('f-lugarDif'); if(chk) chk.checked=false;
+  document.getElementById('condLugar').classList.remove('show');
+  document.getElementById('geoStatus').className='geo-status';
+  document.querySelectorAll('.field-group.error').forEach(g=>g.classList.remove('error'));
+  CONFIG._coords=null;
+}
+
+/* Config modal */
+function openConfigModal(){
+  document.getElementById('sheetsUrlInput').value=CONFIG.SHEETS_URL||'';
+  document.getElementById('configModal').classList.add('open');
+}
+function closeConfigModal(){ document.getElementById('configModal').classList.remove('open'); }
+function saveConfig(){
+  const url=document.getElementById('sheetsUrlInput').value.trim();
+  CONFIG.SHEETS_URL=url;
+  localStorage.setItem('rdr_sheets_url',url);
+  closeConfigModal();
+  alert(url ? '✓ Sincronización con Google Sheets activada.' : 'Modo local activado.');
+}
+document.getElementById('configModal').addEventListener('click',function(e){
+  if(e.target===this) closeConfigModal();
+});
+
+/* Load user nodes after map is ready */
+loadUserNodos();
+</script>
+
+</body>
+</html>
