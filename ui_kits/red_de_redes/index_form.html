@@ -62,11 +62,12 @@
   }
   @keyframes p{0%,100%{transform:scale(1)}50%{transform:scale(1.25)}}
 
-  /* main grid — starts full-width (no ficha); opens to 2-col on node select */
+  /* main grid — starts full-width (no ficha); opens to 2-col on node select.
+     NO transition on grid-template-columns: the instant snap is invisible
+     because the eye follows the zoom + ficha animations. */
   main{
     max-width:1480px;margin:0 auto;padding:28px 36px 80px;
     display:grid;grid-template-columns:1fr;gap:24px;align-items:stretch;
-    transition:grid-template-columns 0.4s cubic-bezier(0.4,0,0.2,1);
   }
   main.ficha-open{
     grid-template-columns:1.4fr 1fr;
@@ -1420,19 +1421,20 @@ function zoomToNode(n){
 function resetZoom(){
   const main = document.getElementById('contenido');
   const wrap = document.getElementById('mapWrap');
-  // Animate ficha out before hiding
+  // 1. Reset zoom transform immediately (while ficha is still visible)
+  wrap.style.transform = 'translate(0px,0px) scale(1)';
+  document.getElementById('zoomReset').style.display = 'none';
+  // 2. Deselect nodes
+  document.querySelectorAll('.node.nodo').forEach(el=>el.classList.remove('selected'));
+  document.querySelectorAll('.node-label').forEach(el=>el.classList.remove('selected'));
+  // 3. Animate ficha out, THEN snap grid back (after animation)
   if(main.classList.contains('ficha-open')){
     main.classList.add('ficha-closing');
     setTimeout(()=>{
       main.classList.remove('ficha-open');
       main.classList.remove('ficha-closing');
-    }, 300);
+    }, 300); // matches fichaOut duration
   }
-  wrap.style.transform = 'translate(0px,0px) scale(1)';
-  document.getElementById('zoomReset').style.display = 'none';
-  // Deselect all nodes
-  document.querySelectorAll('.node.nodo').forEach(el=>el.classList.remove('selected'));
-  document.querySelectorAll('.node-label').forEach(el=>el.classList.remove('selected'));
 }
 
 /* =====================================================================
@@ -1458,11 +1460,14 @@ function select(id){
   document.querySelectorAll('.node-label').forEach(el=>{
     el.classList.toggle('selected', el.dataset.labelId===id);
   });
-  // Open ficha panel (triggers grid layout shift)
+  // Open ficha panel (instant grid snap — no CSS transition)
   document.getElementById('contenido').classList.add('ficha-open');
   renderFicha();
-  // Zoom AFTER layout settles so stage.clientWidth is correct
-  setTimeout(()=>{ zoomToNode(nodos[current]); }, 60);
+  // Zoom after TWO animation frames so the browser has painted the new layout
+  // (double-RAF guarantees stage.clientWidth reflects the new grid column)
+  requestAnimationFrame(()=>{
+    requestAnimationFrame(()=>{ zoomToNode(nodos[current]); });
+  });
   // Mobile: scroll hint + auto-scroll to ficha
   if(window.innerWidth < 1080){
     showScrollHint();
