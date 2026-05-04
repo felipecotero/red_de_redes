@@ -428,12 +428,17 @@
   /* --- Tablet / stacked (≤ 1079 px) ----------------------------- */
   @media (max-width:1079px){
     main{
-      grid-template-columns:1fr;
+      grid-template-columns:1fr !important; /* nunca 2 columnas en móvil */
       padding:20px 24px 60px;
       gap:20px;
     }
-    /* On stacked layout the ficha sits below — cap height so it
-       doesn't push everything off screen on landscape tablets */
+    /* Ficha siempre se despliega DEBAJO del mapa en pantallas pequeñas */
+    main.ficha-open aside.ficha{
+      display:flex !important;
+      flex-direction:column;
+      animation:fichaIn .35s cubic-bezier(0.4,0,0.2,1) forwards;
+    }
+    /* Cap de altura para que no empuje todo fuera de pantalla */
     .ficha{ max-height:70vh; }
     .ficha-body{ max-height:calc(70vh - 180px); }
   }
@@ -453,6 +458,9 @@
       align-items:flex-start;
       gap:10px;
       padding:14px 18px 12px;
+    }
+    .header-right{
+      width:100%;justify-content:space-between;
     }
     .brand h1{ font-size:28px; }
     header .meta{ text-align:left; }
@@ -484,7 +492,7 @@
     .scale .bar{ width:60px; }
     .map-attrib{ display:none; }
 
-    /* ficha: uncap height (it's already below the map in stacked layout) */
+    /* ficha: sin cap de altura en móvil (se puede hacer scroll) */
     .ficha{ max-height:none; }
     .ficha-body{ max-height:none; }
 
