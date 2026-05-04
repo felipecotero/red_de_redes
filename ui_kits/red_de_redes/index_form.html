@@ -1430,9 +1430,15 @@ async function loadUserNodos(){
   const stored = getStoredNodos();
   const sheets = await loadFromSheets();
   const all = [...stored, ...sheets];
-  // dedupe by id
+  // dedupe by id, then paint each new node on the map
   const seen = new Set(nodos.map(n=>n.id));
-  all.forEach(n=>{ if(!seen.has(n.id)){ nodos.push(n); seen.add(n.id); } });
+  all.forEach(n=>{
+    if(!seen.has(n.id)){
+      nodos.push(n);
+      seen.add(n.id);
+      addNodoToMap(n); // ← pinta el punto en el SVG
+    }
+  });
   updateCounter();
 }
 
