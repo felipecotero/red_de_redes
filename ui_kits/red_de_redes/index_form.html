@@ -32,7 +32,7 @@
     padding:18px 36px 18px;border-bottom:1.5px solid var(--rdr-ink);
   }
   .brand-logo{
-    display:block;height:36px;width:auto;
+    display:block;height:50px;width:auto;
     margin-bottom:10px;
     opacity:0.85;
   }
@@ -70,10 +70,33 @@
   }
   @keyframes p{0%,100%{transform:scale(1)}50%{transform:scale(1.25)}}
 
-  /* main grid */
+  /* main grid — starts full-width (no ficha); opens to 2-col on node select */
   main{
     max-width:1480px;margin:0 auto;padding:28px 36px 80px;
-    display:grid;grid-template-columns:1.4fr 1fr;gap:24px;align-items:stretch;
+    display:grid;grid-template-columns:1fr;gap:24px;align-items:stretch;
+    transition:grid-template-columns 0.4s cubic-bezier(0.4,0,0.2,1);
+  }
+  main.ficha-open{
+    grid-template-columns:1.4fr 1fr;
+  }
+
+  /* Header right group — meta + button flush right */
+  .header-right{
+    display:flex;align-items:flex-start;gap:20px;flex-shrink:0;
+  }
+  header .meta{text-align:right}
+
+  /* Ficha hidden until a node is selected */
+  aside.ficha{
+    display:none;opacity:0;
+  }
+  main.ficha-open aside.ficha{
+    display:flex;flex-direction:column;
+    animation:fichaIn .35s cubic-bezier(0.4,0,0.2,1) forwards;
+  }
+  @keyframes fichaIn{
+    from{opacity:0;transform:translateX(18px)}
+    to{opacity:1;transform:translateX(0)}
   }
 
   /* MAP STAGE */
@@ -767,14 +790,16 @@
     <h1>Red <em>de redes</em></h1>
     <div class="doc"><b>Mapa de nodos priorizados</b> · Implementación 2026</div>
   </div>
-  <div class="meta">
-    <div class="pulse">Mapa en construcción</div>
-    <div><b id="nodoCount">3</b> nodos cargados</div>
-    <div>Junio 15 — Julio 15 · 2026</div>
+  <div class="header-right">
+    <div class="meta">
+      <div class="pulse">Mapa en construcción</div>
+      <div><b id="nodoCount">3</b> nodos cargados</div>
+      <div>Junio 15 — Julio 15 · 2026</div>
+    </div>
+    <button class="add-node-btn" id="addNodeBtn" onclick="openFormDrawer()">
+      <span class="plus">+</span> Agregar nodo
+    </button>
   </div>
-  <button class="add-node-btn" id="addNodeBtn" onclick="openFormDrawer()">
-    <span class="plus">+</span> Agregar nodo
-  </button>
 </header>
 
 <main id="contenido">
@@ -1220,10 +1245,10 @@ async function loadMap(){
   nodos.forEach((n, i)=>{
     const p = projector(n.lon, n.lat);
     n._x = p.x; n._y = p.y;
-    // Cúcuta is on the right edge — label to the left; Quibdó is left — label to the right
     const labelClass = n.id==='quibdo' ? '' : 'left';
-    html += `<button class="node nodo ${i===0?'selected':''}" data-id="${n.id}" style="left:${toP(p.x,W)};top:${toP(p.y,H)}" aria-label="${n.city} — ${n.red}"></button>`;
-    html += `<div class="node-label ${labelClass} ${i===0?'selected':''}" data-label-id="${n.id}" style="left:${toP(p.x,W)};top:${toP(p.y,H)}">${n.city}<small>${n.red}</small></div>`;
+    // No node pre-selected on load — map starts clean
+    html += `<button class="node nodo" data-id="${n.id}" style="left:${toP(p.x,W)};top:${toP(p.y,H)}" aria-label="${n.city} — ${n.red}"></button>`;
+    html += `<div class="node-label ${labelClass}" data-label-id="${n.id}" style="left:${toP(p.x,W)};top:${toP(p.y,H)}">${n.city}<small>${n.red}</small></div>`;
   });
   layer.innerHTML = html;
 
@@ -1233,13 +1258,11 @@ async function loadMap(){
   });
 
   document.getElementById('loading').style.display='none';
-
-  // Zoom to the initially selected node once the map is ready
-  zoomToNode(nodos[current]);
+  // No initial zoom — map starts at full view
 
   // NOW safe to paint user-added nodes — projector is ready
   await loadUserNodos();
-  renderFicha(); // refresh ficha counter now that user nodes are included
+  updateCounter();
 }
 
 /* =====================================================================
@@ -1352,6 +1375,11 @@ function resetZoom(){
   const wrap = document.getElementById('mapWrap');
   wrap.style.transform = 'translate(0px,0px) scale(1)';
   document.getElementById('zoomReset').style.display = 'none';
+  // Close ficha and return to full-width map
+  document.getElementById('contenido').classList.remove('ficha-open');
+  // Deselect all nodes
+  document.querySelectorAll('.node.nodo').forEach(el=>el.classList.remove('selected'));
+  document.querySelectorAll('.node-label').forEach(el=>el.classList.remove('selected'));
 }
 
 /* =====================================================================
@@ -1377,10 +1405,12 @@ function select(id){
   document.querySelectorAll('.node-label').forEach(el=>{
     el.classList.toggle('selected', el.dataset.labelId===id);
   });
-  // Zoom map to selected node
-  zoomToNode(nodos[current]);
+  // Open ficha panel (triggers grid layout shift)
+  document.getElementById('contenido').classList.add('ficha-open');
   renderFicha();
-  // Mobile: show hint + auto-scroll to ficha after zoom starts
+  // Zoom AFTER layout settles so stage.clientWidth is correct
+  setTimeout(()=>{ zoomToNode(nodos[current]); }, 60);
+  // Mobile: scroll hint + auto-scroll to ficha
   if(window.innerWidth < 1080){
     showScrollHint();
     setTimeout(()=>{
@@ -1389,7 +1419,6 @@ function select(id){
   }
 }
 
-renderFicha();
 loadMap();
 
 /* Click on map background (not on a node) → reset zoom */
