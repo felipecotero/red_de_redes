@@ -304,6 +304,21 @@
   }
   @keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(3px)}}
 
+  /* CIERRE MÓVIL: botón sobre el triángulo magenta */
+  .ficha-close-btn{
+    display:none; /* sólo visible en móvil (ver media query) */
+    position:absolute;top:8px;right:8px;z-index:50;
+    align-items:center;gap:5px;
+    background:#e6195b;border:none;border-radius:99px;
+    padding:5px 12px 5px 9px;
+    font-family:var(--rdr-font-mono);font-size:9.5px;
+    text-transform:uppercase;letter-spacing:0.14em;color:#fff;
+    cursor:pointer;box-shadow:0 2px 10px rgba(230,25,91,0.35);
+  }
+  .ficha-close-btn svg{flex-shrink:0}
+  /* Barra de arrastre: oculta en desktop */
+  .ficha-handle{ display:none; }
+
   /* FICHA panel — estilos visuales (posicionamiento en .stage, ver arriba) */
   .ficha{
     background:#f4f0e8;border-left:1.5px solid var(--rdr-ink);
@@ -422,6 +437,18 @@
   /* La ficha está dentro de .stage (overflow:hidden). En móvil la sacamos
      del flujo con position:fixed como bottom-sheet para que sea legible. */
   @media (max-width:1079px){
+    /* Barra de arrastre visible en la parte superior del bottom-sheet */
+    .ficha-handle{
+      display:flex;justify-content:center;padding:10px 0 4px;
+      background:#f4f0e8;flex-shrink:0;
+    }
+    .ficha-handle::before{
+      content:"";width:40px;height:4px;border-radius:99px;
+      background:rgba(26,23,21,0.25);
+    }
+    /* Botón cerrar — solo móvil */
+    .ficha-close-btn{ display:flex !important; }
+    /* Ficha como bottom-sheet */
     aside.ficha{
       position:fixed !important;
       top:auto !important; bottom:0 !important;
@@ -850,6 +877,16 @@
 
     <!-- ====== FICHA (overlay absoluto dentro del stage) ====== -->
     <aside class="ficha" id="fichaWrap">
+      <!-- Barra de arrastre (mobile) -->
+      <div class="ficha-handle" aria-hidden="true"></div>
+      <!-- Botón cerrar (mobile): encima del triángulo magenta -->
+      <button class="ficha-close-btn" onclick="resetZoom()" aria-label="Volver al mapa">
+        <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+          <line x1="1" y1="1" x2="9" y2="9" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/>
+          <line x1="9" y1="1" x2="1" y2="9" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/>
+        </svg>
+        Volver al mapa
+      </button>
       <div id="ficha"></div>
 
     <!-- FORM DRAWER -->
