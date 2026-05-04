@@ -16,15 +16,7 @@
     color:var(--rdr-ink); font-family:var(--rdr-font-body);
   }
 
-  /* a11y bar */
-  .a11y-strip{
-    display:flex;align-items:center;justify-content:space-between;
-    padding:9px 36px; background:rgba(26,23,21,0.05);
-    border-bottom:1px solid var(--rdr-line);
-    font-family:var(--rdr-font-mono);font-size:11px;
-    color:var(--rdr-ink-mute);text-transform:uppercase;letter-spacing:0.16em;
-  }
-  .a11y-strip a.skip{color:var(--rdr-ink);font-weight:600;text-decoration:none}
+
 
   /* header */
   header.top{
@@ -94,9 +86,17 @@
     display:flex;flex-direction:column;
     animation:fichaIn .35s cubic-bezier(0.4,0,0.2,1) forwards;
   }
+  main.ficha-closing aside.ficha{
+    display:flex;flex-direction:column;
+    animation:fichaOut .3s cubic-bezier(0.4,0,0.2,1) forwards;
+  }
   @keyframes fichaIn{
     from{opacity:0;transform:translateX(18px)}
     to{opacity:1;transform:translateX(0)}
+  }
+  @keyframes fichaOut{
+    from{opacity:1;transform:translateX(0)}
+    to{opacity:0;transform:translateX(18px)}
   }
 
   /* MAP STAGE */
@@ -782,14 +782,6 @@
 </head>
 <body>
 
-<div class="a11y-strip">
-  <a href="#contenido" class="skip">Saltar al contenido</a>
-  <div class="rdr-a11y-nav" aria-label="Accesibilidad">
-    <span>Tamaño</span>
-    <button>A−</button><button>A</button><button>A+</button>
-    <button style="width:auto;padding:0 12px;height:26px;font-size:10px">Alto contraste</button>
-  </div>
-</div>
 
 <header class="top">
   <div class="brand">
@@ -1131,6 +1123,52 @@ const nodos = [
     lugar:'Neiva',
     direccion:'Por confirmar',
   },
+  {
+    id:'inirida',
+    lon:-67.92, lat:3.87, city:'Inírida',
+    red:'Red de Mujeres',
+    redLong:'Red de mujeres lideresas del sector cultural de Guainía',
+    departamento:'Guainía',
+    representantes:[
+      {nombre:'Ninfa Rodríguez', rol:'Representante del nodo', tel:'310 859 9010'},
+    ],
+    correo:'',
+    web:'',
+    organizaciones:15,
+    fortaleza:'Fortalecimiento de los oficios y quehaceres de las mujeres del sector cultural en el departamento de Inírida.',
+    delegados:[
+      {nombre:'Alba Cecilia Pineda', rol:'Delegada Mincultura · Dirección de Poblaciones'},
+      {nombre:'Alejandra Ballén', rol:'Delegada Mincultura · Dirección de Poblaciones'},
+    ],
+    grupo:'Dirección de Poblaciones',
+    fecha:'25 de junio · 2026',
+    fechaNote:'Tentativo, a concertar con organizaciones.',
+    lugar:'Inírida',
+    direccion:'Inírida · Guainía',
+  },
+  {
+    id:'choachi',
+    lon:-73.93, lat:4.53, city:'Choachí',
+    red:'Red de Parteras',
+    redLong:'Red de parteras campesinas tradicionales',
+    departamento:'Cundinamarca',
+    representantes:[
+      {nombre:'Andrea Barreto', rol:'Representante del nodo', tel:'321 412 4447'},
+    ],
+    correo:'',
+    web:'',
+    organizaciones:10,
+    fortaleza:'Reconocimiento de las parteras campesinas tradicionales como sujetas de derecho y portadoras de saber ancestral en los municipios del oriente de Cundinamarca.',
+    delegados:[
+      {nombre:'Alba Cecilia Pineda', rol:'Delegada Mincultura · Dirección de Poblaciones'},
+      {nombre:'Alejandra Ballén', rol:'Delegada Mincultura · Dirección de Poblaciones'},
+    ],
+    grupo:'Dirección de Poblaciones',
+    fecha:'22 de junio · 2026',
+    fechaNote:'Tentativo, a concertar con organizaciones',
+    lugar:'Choachí',
+    direccion:'Por confirmar',
+  },
 ];
 
 const bogota = {lon:-74.08, lat:4.61};
@@ -1380,11 +1418,18 @@ function zoomToNode(n){
 }
 
 function resetZoom(){
+  const main = document.getElementById('contenido');
   const wrap = document.getElementById('mapWrap');
+  // Animate ficha out before hiding
+  if(main.classList.contains('ficha-open')){
+    main.classList.add('ficha-closing');
+    setTimeout(()=>{
+      main.classList.remove('ficha-open');
+      main.classList.remove('ficha-closing');
+    }, 300);
+  }
   wrap.style.transform = 'translate(0px,0px) scale(1)';
   document.getElementById('zoomReset').style.display = 'none';
-  // Close ficha and return to full-width map
-  document.getElementById('contenido').classList.remove('ficha-open');
   // Deselect all nodes
   document.querySelectorAll('.node.nodo').forEach(el=>el.classList.remove('selected'));
   document.querySelectorAll('.node-label').forEach(el=>el.classList.remove('selected'));
