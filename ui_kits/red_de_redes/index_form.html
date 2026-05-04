@@ -28,8 +28,13 @@
 
   /* header */
   header.top{
-    display:flex;align-items:flex-end;justify-content:space-between;gap:32px;
-    padding:28px 36px 20px;border-bottom:1.5px solid var(--rdr-ink);
+    display:flex;align-items:flex-start;justify-content:space-between;gap:32px;
+    padding:18px 36px 18px;border-bottom:1.5px solid var(--rdr-ink);
+  }
+  .brand-logo{
+    display:block;height:36px;width:auto;
+    margin-bottom:10px;
+    opacity:0.85;
   }
   .brand .eye{
     font-family:var(--rdr-font-mono);font-size:10.5px;
@@ -757,6 +762,7 @@
 
 <header class="top">
   <div class="brand">
+    <img src="../../assets/GRIS_CULTURAS.png" alt="Ministerio de las Culturas" class="brand-logo">
     <div class="eye">Ministerio de las Culturas, las Artes y los Saberes</div>
     <h1>Red <em>de redes</em></h1>
     <div class="doc"><b>Mapa de nodos priorizados</b> · Implementación 2026</div>
