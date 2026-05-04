@@ -1230,6 +1230,10 @@ async function loadMap(){
 
   // Zoom to the initially selected node once the map is ready
   zoomToNode(nodos[current]);
+
+  // NOW safe to paint user-added nodes — projector is ready
+  await loadUserNodos();
+  renderFicha(); // refresh ficha counter now that user nodes are included
 }
 
 /* =====================================================================
@@ -1453,7 +1457,7 @@ async function geocode(municipio, departamento){
    ADD NODE TO MAP (after form submit)
 ===================================================================== */
 function addNodoToMap(n){
-  if(!projector || n._x==null) return;
+  if(!projector) return; // projector set only after loadMap() completes
   const layer = document.getElementById('nodesLayer');
   const W=880, H=880;
   const toP = (v,d) => (v/d*100).toFixed(3)+'%';
@@ -1653,8 +1657,7 @@ document.getElementById('configModal').addEventListener('click',function(e){
   if(e.target===this) closeConfigModal();
 });
 
-/* Load user nodes after map is ready */
-loadUserNodos();
+/* User nodes are loaded inside loadMap() once the projector is ready */
 </script>
 
 </body>
