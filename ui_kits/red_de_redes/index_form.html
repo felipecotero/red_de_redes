@@ -1649,10 +1649,19 @@ function openFormDrawer(){
   document.getElementById('formSuccess').classList.remove('show');
   document.getElementById('formBody').style.display='';
   document.getElementById('formFooter').style.display='';
+  // Make the aside panel visible (same mechanism as clicking a node)
+  document.getElementById('contenido').classList.add('ficha-open');
   document.getElementById('formDrawer').classList.add('open');
 }
 function closeFormDrawer(){
   document.getElementById('formDrawer').classList.remove('open');
+  // If no node is selected, also hide the aside panel
+  const anySelected = document.querySelector('.node.nodo.selected');
+  if(!anySelected){
+    document.getElementById('contenido').classList.remove('ficha-open');
+    document.getElementById('mapWrap').style.transform = 'translate(0px,0px) scale(1)';
+    document.getElementById('zoomReset').style.display = 'none';
+  }
 }
 function toggleLugar(){
   const chk = document.getElementById('f-lugarDif');
